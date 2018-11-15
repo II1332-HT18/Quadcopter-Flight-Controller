@@ -23,6 +23,9 @@ static float dt = 0.004;
 
 /* PID variables ----------------*/
 
+/* Gyroscope BIAS */
+const float GYRO_BIAS_Y = 125.0;
+
 /* PID moving averages */
 static int RollMovingAverageSampleSize = 5;
 static int PitchMovingAverageSampleSize = 5;
@@ -33,9 +36,9 @@ static MovingAverage *PIDOutputPitchAverage;
 static MovingAverage *PIDOutputYawAverage;
 
 /* Roll */
-static float roll_kp = 7; //10 
-static float roll_ki = 0.3; //0.2
-static float roll_kd = 0.54;  //0.4
+static float roll_kp = 3.5023;
+static float roll_ki = 0.0560548;
+static float roll_kd = 0.094465;
 static float filtered_roll_angle;
 static float desired_roll_angle = 0;
 static float errorRoll = 0;
@@ -44,9 +47,9 @@ static float integralRoll = 0;
 static float PIDoutputRoll = 0;
 
 /* Pitch */
-static float pitch_kp = 7;
-static float pitch_ki = 0.3;
-static float pitch_kd = 0.54;
+static float pitch_kp = 0;//7;
+static float pitch_ki = 0;//0.3;
+static float pitch_kd = 0;//0.54;
 static float desired_pitch_angle=0;
 static float filt_pitch_angle;
 static float errorPitch=0;
@@ -126,13 +129,13 @@ void automaticControl(main_struct* all_values)
   PID_Roll(filter_pointer);
   
   /* PID moving average calculations */
-  moving_average_move(PIDOutputYawAverage, PIDoutputYaw);
+  /*moving_average_move(PIDOutputYawAverage, PIDoutputYaw);
   moving_average_move(PIDOutputPitchAverage, PIDoutputPitch);
   moving_average_move(PIDOutputRollAverage, PIDoutputRoll);
 
   PIDoutputYaw = moving_average_get_average_float(PIDOutputYawAverage);
   PIDoutputPitch = moving_average_get_average_float(PIDOutputPitchAverage);
-  PIDoutputRoll = moving_average_get_average_float(PIDOutputRollAverage);
+  PIDoutputRoll = moving_average_get_average_float(PIDOutputRollAverage);*/
   
   /* Motor control */
   ThrustOnMotor = pwm_pointer->thrust;
@@ -273,7 +276,7 @@ void PID_Roll(FILTER_complement_struct *filter_pointer)
   
   //Windup control
   if(abs((int)integralRoll) <= 50)
-      integralRoll += errorRoll*dt/2; //I-term
+      integralRoll += errorRoll*dt; //I-term
   
   else if (integralRoll > 0)
       integralRoll = 50;
@@ -281,8 +284,8 @@ void PID_Roll(FILTER_complement_struct *filter_pointer)
   else
       integralRoll = -50;
   
-  derivateRoll = filter_pointer->gyr_y; //D-term
-  PIDoutputRoll =(roll_kp*errorRoll + roll_ki*integralRoll + roll_kd*derivateRoll)/6; //control signal
+  derivateRoll = filter_pointer->gyr_y + GYRO_BIAS_Y; //D-term
+  PIDoutputRoll = roll_kp*errorRoll + roll_ki*integralRoll + roll_kd*derivateRoll; //control signal
 }
 
 /** ****************************************************************************
@@ -298,10 +301,10 @@ void PID_Roll(FILTER_complement_struct *filter_pointer)
 void motorControl(void)
 {
   /* PID MONSTER */
-  RFmotor = (int)(PIDoutputYaw + (int) (ThrustOnMotor + (int)PIDoutputRoll - (int)PIDoutputPitch));
-  LFmotor = (int)(-PIDoutputYaw + (int) (ThrustOnMotor - (int)PIDoutputRoll - (int)PIDoutputPitch));
-  RBmotor = (int)(-PIDoutputYaw + (int) (ThrustOnMotor + (int)PIDoutputRoll + (int)PIDoutputPitch));
-  LBmotor = (int)(PIDoutputYaw + (int) (ThrustOnMotor - (int)PIDoutputRoll + (int)PIDoutputPitch));
+  RFmotor = ThrustOnMotor + lroundf( PIDoutputRoll - PIDoutputPitch + PIDoutputYaw);
+  LFmotor = ThrustOnMotor + lroundf(-PIDoutputRoll - PIDoutputPitch - PIDoutputYaw);
+  RBmotor = ThrustOnMotor + lroundf( PIDoutputRoll + PIDoutputPitch - PIDoutputYaw);
+  LBmotor = ThrustOnMotor + lroundf(-PIDoutputRoll + PIDoutputPitch + PIDoutputYaw);
   
   /* Max duty cycle check */
   if(RFmotor > 2000)

@@ -401,7 +401,18 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  
+  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  GPIO_InitStruct.Pin = GPIO_PIN_15;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
 /**
@@ -549,7 +560,7 @@ void l3gd20h_Init(void)
   
   //CTRL_REG5
   reg_Address = 0x24;                      //rw:0, ms:0 adress: 0x24
-  register_Value = 0x00;                   //0000 0000, Normal mode reboot, FIFO disable, High pass filter disabled, 
+  register_Value = 0x00;                   //0000 0000, Normal mode reboot, FIFO disable, High pass filter DISABLED, 
   write_data(reg_Address, register_Value, GYRO);
   
 }
