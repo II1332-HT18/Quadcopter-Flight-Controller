@@ -1,0 +1,134 @@
+[stlink]
+stlinkserialNo=2798FD0D
+stlinkfoundProbes=
+[DebugChecksum]
+Checksum=508033101
+[Exceptions]
+StopOnUncaught=_ 0
+StopOnThrow=_ 0
+[CodeCoverage]
+Enabled=_ 0
+[Stack]
+FillEnabled=0
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnLogOnly=1
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[CallStack]
+ShowArgs=0
+[Disassembly]
+MixedMode=1
+[SWOTraceHWSettings]
+OverrideDefaultClocks=0
+CpuClock=72000000
+ClockAutoDetect=0
+ClockWanted=2000000
+JtagSpeed=2000000
+Prescaler=36
+TimeStampPrescIndex=0
+TimeStampPrescData=0
+PcSampCYCTAP=1
+PcSampPOSTCNT=15
+PcSampIndex=0
+DataLogMode=0
+ITMportsEnable=0
+ITMportsTermIO=0
+ITMportsLogFile=0
+ITMlogFile=$PROJ_DIR$\ITM.log
+[StLinkDriver]
+CStepIntDis=_ 0
+stlinkserialNo=30303031
+stlinkfoundProbes=
+LeaveTargetRunning=_ 0
+[Interrupts]
+Enabled=1
+[MemConfig]
+Base=1
+Manual=0
+Ddf=1
+TypeViol=0
+Stop=1
+[Trace1]
+Enabled=0
+ShowSource=1
+[Simulator]
+Freq=10000000
+MultiCoreRunAll=1
+[Trace2]
+Enabled=0
+ShowSource=0
+[SWOTraceWindow]
+PcSampling=0
+InterruptLogs=0
+ForcedTimeStamps=0
+EventCPI=0
+EventEXC=0
+EventFOLD=0
+EventLSU=0
+EventSLEEP=0
+[DataLog]
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+[EventLog]
+Title_0=Ch3
+Symbol_0=0 4 1
+Title_1=Ch2
+Symbol_1=0 4 1
+Title_2=Ch1
+Symbol_2=0 4 1
+Title_3=Ch0
+Symbol_3=0 4 1
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+SumSortOrder=0
+[InterruptLog]
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+SumSortOrder=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[DriverProfiling]
+Enabled=0
+Mode=3
+Graph=0
+Symbiont=0
+Exclusions=
+[CallStackLog]
+Enabled=0
+[CallStackStripe]
+ShowTiming=1
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Src}.82.5" 0 0 1 "" 0 "" 0
+Count=1
+[Aliases]
+A0=_ "C:\Program Files\IAR Systems\Embedded Workbench 7.0\arm\inc\c\DLib_Product_string.h" ""
+A1=_ "C:\Users\Johan\Documents\GitHub\Quadcopter\QuadroHT15_v2-1\Drivers\CMSIS\Device\ST\STM32F3xx\Source\Templates\iar\startup_stm32f303xc.s" ""
+A2=_ "C:\Users\Johan\Documents\GitHub\Quadcopter\QuadroHT15_v2-1\Drivers\CMSIS\Device\ST\STM32F3xx\Source\Templates\system_stm32f3xx.c" "C:\Users\Hannes\Documents\GitHub\Quadcopter\QuadroHT15_v2-1\Drivers\CMSIS\Device\ST\STM32F3xx\Source\Templates\system_stm32f3xx.c"
+A3=_ "C:\Users\Johan\Documents\GitHub\Quadcopter\QuadroHT15_v2-1\Drivers\STM32F3xx_HAL_Driver\Src\stm32f3xx_hal_gpio.c" ""
+A4=_ "C:\Users\Johan\Documents\GitHub\Quadcopter\QuadroHT15_v2-1\Drivers\STM32F3xx_HAL_Driver\Src\stm32f3xx_hal_uart.c" ""
+A5=_ "C:\Users\Johan\Documents\GitHub\Quadcopter\QuadroHT15_v2-1\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM4F\portasm.s" ""
+A6=_ "C:\Users\Johan\Documents\GitHub\Quadcopter\QuadroHT15_v2-1\Middlewares\Third_Party\FreeRTOS\Source\tasks.c" ""
+A7=_ "D:\Quadkopter_master_v1.0\Quadcopter\QuadroHT15_v2-1\Src\Filter.c" ""
+A8=_ "E:\Quadkopter_master_v1.0\Quadcopter\QuadroHT15_v2-1\Src\automaticControl.c" ""
+Count=9
+SuppressDialog=1
