@@ -1,0 +1,30 @@
+EwingKang/QuadCopter-Quaternion-Dynamics-in-Simulink
+Problems from m-file: 
+1.Error-> OS4dynamics_plot_01(line21)
+plot(os4sim_time.data,os4sim_stateR.data(:,1),'r'); hold on
+2. Run OS4dynamics_01_init
+   Run OS4dynamics_animation_01
+   Shows Error
+	Undefined variable "os4sim_time" or class "os4sim_time.data".
+
+	Error in OS4dynamics_animation_01 (line 159)
+	for i=2:size(os4sim_time.data)
+   Shows Warning
+   	No video frames were written to this file. The file may be invalid. 
+   	> In VideoWriter/close (line 278)
+     	In VideoWriter/delete (line 213)
+     	In OS4dynamics_animation_01 (line 152)
+  Show Figure, 
+  But there is a video with some millsecond and create a avi file named os4sim_animation
+  It feels like the video is not playing right, but wondering why.
+
+
+3. run OS4dynamics_animation_01 only
+Error->
+Undefined variable "OS4_physical" or class "OS4_physical.size.fuselage.x".
+
+Error in OS4dynamics_animation_01 (line 26)
+    X_fl = [OS4_physical.size.fuselage.x/2 , OS4_physical.size.fuselage.x/2 ,
+    -OS4_physical.size.fuselage.x/2 , -OS4_physical.size.fuselage.x/2
+    OS4_physical.size.fuselage.x/2];
+something shows up but emty
