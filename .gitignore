@@ -52,4 +52,4 @@ Mkfile.old
 dkms.conf
 
 # EWARM folder ignore
-EWARM
+EWARM/
