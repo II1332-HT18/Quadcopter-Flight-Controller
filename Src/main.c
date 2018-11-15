@@ -59,8 +59,13 @@ osMailQId sensorFilter_mailbox;
 uint8_t iNemo = 0; 
 /* Global. Kalman or complementary. 1 for kalman, 0 for complementary */
 uint8_t kalman = 0;
+
+/*Global. Fixa en till variabel för de olika reglersystemen 0 för grupp 1; 1 för grupp 2
+uint8_t reglersystem = 0;
+*/
+
 /* Global frequency */
-const portTickType MAIN_FREQUENCY = 4; //Q: what is this used for? SHOULD BEE 4
+const portTickType MAIN_FREQUENCY = 4; //Q: what is this used for? SHOULD BE 4
 
 /* Function definitions ------------------------------------------------------*/
 /* Main program body */
