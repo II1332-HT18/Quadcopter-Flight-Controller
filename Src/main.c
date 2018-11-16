@@ -99,7 +99,7 @@ int main(void)
   pwmInTaskHandle = osThreadCreate(osThread(pwmInTask), NULL);
   
   /* Analysis thread */
-  osThreadDef(analysTask, StartAnalysTask, osPriorityLow, 1, 128);
+  osThreadDef(analysTask, StartAnalysTask, osPriorityNormal, 1, 128);
   analysTaskHandle = osThreadCreate(osThread(analysTask), NULL);
   
   /* Sensor and filtering thread */
