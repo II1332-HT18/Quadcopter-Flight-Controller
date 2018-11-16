@@ -29,12 +29,12 @@
 #define MAX_ANALYSE_CHANNELS 7
 
 /* External variables --------------------------------------------------------*/
-extern UART_HandleTypeDef huart3;
+extern UART_HandleTypeDef huart2;
 extern const portTickType MAIN_FREQUENCY;
 //For test purposes
 uint32_t gAnalysWDCheckback=0;
 
-// static int16_t val[ANALYSE_CHANNELS];
+static int16_t val[MAX_ANALYSE_CHANNELS];
 
 /* Thread definitions --------------------------------------------------------*/
 /** ****************************************************************************
@@ -48,26 +48,32 @@ void StartAnalysTask(void const * argument)
 { 
   portTickType last_task_start = xTaskGetTickCount();
   
-//    ACC_TypeDef acc_values;
-//    GYR_TypeDef gyr_values;
+    ACC_TypeDef acc_values;
+    GYR_TypeDef gyr_values;
   
   /* Thread */
   while(1)
   {
-//    ACC_update_xyz();
-//    GYR_update_xyz();
-
-//    val[0] = acc_values->x_raw;
-//    val[1] = acc_values->y_raw;
-//    val[2] = acc_values->z_raw;
-//    val[3] = gyr_values->x_raw;
-//    val[4] = gyr_values->y_raw;
-//    val[5] = gyr_values->z_raw;
-//    val[6] = xTaskGetTickCount();
+    ACC_update_xyz();
+    GYR_update_xyz();
+    
+    val[0] = acc_values.x_raw;
+    val[1] = acc_values.y_raw;
+    val[2] = acc_values.z_raw;
+    val[3] = gyr_values.x_raw;
+    val[4] = gyr_values.y_raw;
+    val[5] = gyr_values.z_raw;
+    val[6] = xTaskGetTickCount();
+    
+    char test[3];
+    test[0]='h';
+    test[1]='e';
+    test[2]='j';
+    
     
 //    /* Transmit signals to UART peripheral */
-//    HAL_UART_Transmit(&huart3,(uint8_t*)&val, sizeof(val), 4);
-//    huart3.State = HAL_UART_STATE_READY;
+    HAL_UART_Transmit(&huart2,(uint8_t*)&test, sizeof(test),4);
+    huart2.State = HAL_UART_STATE_READY;
     
     // Sleep thread until end of hyperperiod
     vTaskDelayUntil(&last_task_start,MAIN_FREQUENCY); 
