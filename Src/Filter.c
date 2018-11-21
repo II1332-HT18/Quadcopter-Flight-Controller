@@ -110,25 +110,6 @@ void StartsensorFilterTask(void const * arguments)
     
     // Run complement filter
     filter_complement(&complement_data);
-    
-    // Send data with UART.
-    float val[11];
-    uint8_t ctr = 0;
-    val[ctr++] = xTaskGetTickCount();
-    val[ctr++] = lowpass_data_acc_x.output;
-    val[ctr++] = lowpass_data_acc_y.output;
-    val[ctr++] = lowpass_data_acc_z.output; 
-    val[ctr++] = acc_raw.x_raw;
-    val[ctr++] = acc_raw.z_raw;
-    val[ctr++] = acc_raw.y_raw;
-    val[ctr++] = complement_data.filter_pitch;
-    val[ctr++] = complement_data.filter_roll;
-    val[ctr++] = complement_data.acc_pitch;
-    val[ctr++] = complement_data.acc_roll;
-      
-    // Transmit signals to UART peripheral
-    HAL_UART_Transmit(&huart3,(uint8_t*)&val, sizeof(float)*ctr, 4);
-    huart3.State = HAL_UART_STATE_READY;
 
     // Send mail
     //  osMailPut(analys_mailbox, lowpass_data_acc_x);
