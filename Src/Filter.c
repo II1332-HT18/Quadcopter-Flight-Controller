@@ -27,7 +27,7 @@ void filter_complement(FILTER_complement_struct* complement_data);
 float angle_speed_calculator(FILTER_angle_speed_struct *history,float current_value);
 
 /* FUNCTION DEFINITIONS *******************************************************/
-/** ****************************************************************************
+/*******************************************************************************
  * @brief Filtering task
  *
  * @detail Thread that reads sensor data from the gyroscope and accelerometer,
@@ -85,6 +85,7 @@ void StartsensorFilterTask(void const * arguments)
   lowpass_data_acc_z.val2[1] = 0;
   lowpass_data_acc_z.val2[2] = 0;
 
+  //Setting main struct values to zero
   complement_data.acc_x         = 0;
   complement_data.acc_y         = 0;
   complement_data.acc_z         = 0;
@@ -281,7 +282,7 @@ void filter_lowpass(FILTER_lowpass_struct *IO_data, float input){
   IO_data->output = y[0];
 }
 
-/** ****************************************************************************
+/*******************************************************************************
  * @brief Complement filter combining gyroscope and accelerometer data
  *
  * @param FILTER_complement_struct* complement_data Pointer to the struct from
