@@ -1,6 +1,7 @@
 
 /** ****************************************************************************
 * @file
+*
 * @author  Simon Strom, Henrik Bjorklund
 * @version 1.0
 * @date    2017-11-24
@@ -101,7 +102,10 @@ void StartAnalysTask(void const * argument)
     val[ctr++] = filter_data->filter_pitch;
     val[ctr++] = filter_data->filter_roll;
     val[ctr++] = filter_data->filter_yaw;
-    //a comment to experiment with GIT
+    val[ctr++] = filter_data->raw_acc_x;
+    val[ctr++] = filter_data->raw_acc_y; 
+    val[ctr++] = filter_data->raw_acc_z;
+    
     
       
     // Transmit signals to UART peripheral

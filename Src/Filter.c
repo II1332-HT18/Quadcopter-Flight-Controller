@@ -1,5 +1,9 @@
 /** ****************************************************************************
 * @file    filter.c
+*
+* @author  Alpha Fofana, Carl Mossberg, Simon Lagerqvist, Tommie Höglund Gran
+* @version 1.1
+* @date    2018-11-22
 * @author  Henrik Bjorklund, Therese Kennerberg, Jonathan Lindberg, Simon Strom
 * @version v1.0
 * @date   2017-12-08
@@ -73,6 +77,7 @@ void StartsensorFilterTask(void const * arguments)
   lowpass_data_acc_z.val2[1] = 0;
   lowpass_data_acc_z.val2[2] = 0;
   
+  //Setting main struct values to zero
   complement_data.acc_x         = 0;
   complement_data.acc_y         = 0;
   complement_data.acc_z         = 0;
@@ -107,6 +112,11 @@ void StartsensorFilterTask(void const * arguments)
     complement_data.gyr_x = gyr_raw.x_raw;
     complement_data.gyr_y = gyr_raw.y_raw;
     complement_data.gyr_z = gyr_raw.z_raw;
+    
+    //Below created to access the RAW acc data to be able ro analyze
+    complement_data.raw_acc_x = acc_raw.x_raw;  //the actual RAW acc_x
+    complement_data.raw_acc_y = acc_raw.y_raw;  //the actual RAW acc_y
+    complement_data.raw_acc_z = acc_raw.z_raw;  //the actual RAW acc_z
     
     // Run complement filter
     filter_complement(&complement_data);
