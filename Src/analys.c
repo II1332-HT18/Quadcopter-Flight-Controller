@@ -51,12 +51,19 @@ void StartAnalysTask(void const * argument)
   osEvent check_mail = osMailGet(sensorFilter_mailbox, osWaitForever);
   FILTER_complement_struct *filter_data = (FILTER_complement_struct*)check_mail.value.p;
   
+  osEvent check_mail2 = osMailGet(analys_mailbox, osWaitForever);
+  main_struct *control_data = (main_struct*)check_mail2.value.p;
+  
 //    ACC_TypeDef acc_values;
 //    GYR_TypeDef gyr_values;
   
+  
+  //Delay på 10sekunder för att hinna pair:a från datorn till quadens analys-bluetooth
+  vTaskDelay(10000); // (kommentera bort denna rad om bluetooth inte används)
+  
+  
   /* Thread */
-  while(1)
-  {
+  while(1){
     
 //    ACC_update_xyz();
 //    GYR_update_xyz();
@@ -85,9 +92,10 @@ void StartAnalysTask(void const * argument)
 //    val[ctr++] = complement_data.acc_pitch;
 //    val[ctr++] = complement_data.acc_roll;
     
+    
     //might have to use "->"
     //do this with loop?
-    float val[11];
+    float val[23];
     uint8_t ctr = 0;
     //val[ctr++] = xTaskGetTickCount();
     val[ctr++] = filter_data->acc_x;
@@ -102,7 +110,28 @@ void StartAnalysTask(void const * argument)
     val[ctr++] = filter_data->filter_roll;
     val[ctr++] = filter_data->filter_yaw;
     
-      
+    
+    //från PID:n
+    val[ctr++] = control_data->PIDoutputGyroYaw.f;    //12        //Change name of errorgyroyaw
+    val[ctr++] = control_data->PIDoutputPitch.f;  //13
+    val[ctr++] = control_data->PIDoutputRoll.f;   //14
+    
+   
+    //motorerna
+    val[ctr++] = control_data->RFmotor.f;         //15
+    val[ctr++] = control_data->LFmotor.f;         //16
+    val[ctr++] = control_data->RBmotor.f;         //17
+    val[ctr++] = control_data->LBmotor.f;         //18
+    
+    
+    //från handkontrollern
+    val[ctr++] = control_data->yaw.f;             //19
+    val[ctr++] = control_data->pitch.f;           //20
+    val[ctr++] = control_data->roll.f;            //21
+    val[ctr++] = control_data->thrust;          //22
+    val[ctr++] = control_data->emergency;       //23
+     
+    
     // Transmit signals to UART peripheral
     HAL_UART_Transmit(&huart3,(uint8_t*)&val, sizeof(float)*ctr, 4);
     huart3.State = HAL_UART_STATE_READY;
