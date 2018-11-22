@@ -101,6 +101,7 @@ void StartAnalysTask(void const * argument)
     val[ctr++] = filter_data->filter_pitch;
     val[ctr++] = filter_data->filter_roll;
     val[ctr++] = filter_data->filter_yaw;
+    //a comment to experiment with GIT
     
       
     // Transmit signals to UART peripheral
