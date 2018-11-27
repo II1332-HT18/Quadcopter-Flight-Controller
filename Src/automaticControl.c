@@ -149,6 +149,24 @@ void automaticControl(main_struct* all_values)
   changeVelocityOnMotorsWithPulseWidth(RBmotor, 2); // Right back motor 
   changeVelocityOnMotorsWithPulseWidth(LBmotor, 4); // Left back motor 
    
+  //pull all in  all_values
+  all_values->PIDoutputGyroYaw.f = PIDoutputYaw;      //Change name of errorgyroyaw
+  all_values->PIDoutputPitch.f = PIDoutputPitch;
+  all_values->PIDoutputRoll.f= PIDoutputRoll;
+  
+  all_values->RFmotor.f = RFmotor;
+  all_values->LFmotor.f = LFmotor;
+  all_values->RBmotor.f = RBmotor;
+  all_values->LBmotor.f = LBmotor;
+  
+  all_values->yaw.f = desired_yaw_angle;
+  all_values->pitch.f = desired_pitch_angle;
+  all_values->roll.f = desired_roll_angle;
+  all_values->thrust = ThrustOnMotor;
+  all_values->emergency = EmergencyValue;
+  
+  osMailPut(analys_mailbox, all_values);
+  
   /* Free memory occupied by mail */
   osMailFree(pwmIn_mailbox, pwm_pointer);
   osMailFree(sensorFilter_mailbox, filter_pointer);
