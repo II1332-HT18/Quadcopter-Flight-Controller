@@ -53,6 +53,8 @@ void StartPwmInTask(void const * argument)
   portTickType  last_task_start = xTaskGetTickCount();
   while(1){
     
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+    
     /*Creates space on the mailbox pwmIn_mailbo*/
     pwmIn_struct *pwmIn_struct_pointer =
       (pwmIn_struct*)osMailAlloc(pwmIn_mailbox, osWaitForever);
@@ -109,6 +111,9 @@ void StartPwmInTask(void const * argument)
     }
 
     gPwmInWDCheckback++;
+    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+    
     /*We are done ..and then we wait...*/ 
     vTaskDelayUntil(&last_task_start,MAIN_FREQUENCY); 
   

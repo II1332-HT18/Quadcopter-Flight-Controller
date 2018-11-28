@@ -87,6 +87,8 @@ void StartsensorFilterTask(void const * arguments)
   
   while(1)
   {
+    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
     // Preparing accelerometer data.
     ACC_update_xyz();           // Reading sensor data and storing to driver struct.
     ACC_get_struct(&acc_raw);   // Copying driver struct data to local data struct.
@@ -114,6 +116,9 @@ void StartsensorFilterTask(void const * arguments)
     // Send mail
     //  osMailPut(analys_mailbox, lowpass_data_acc_x);
     osMailPut(sensorFilter_mailbox, &complement_data);
+    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+    
     vTaskDelayUntil(&last_task_start,MAIN_FREQUENCY); 
     
   }

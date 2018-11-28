@@ -71,6 +71,9 @@ void StartControlTask(void const * arguments)
   /* Main loop */
   while(1)
   {
+    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+    
     /* Get RC control PWM values */
     getPWMinValues(all_values);
     osMailPut(sensorFilter_mailbox, all_values);
@@ -94,6 +97,8 @@ void StartControlTask(void const * arguments)
     /* Watchdog check back */
     gMainloopWDCheckback++;
 
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+    
     /* Delay the task to a fixed time to ensure constant execution frequncy */
     vTaskDelayUntil(&last_task_start,CONTROLL_FREQUENCY); 
   }

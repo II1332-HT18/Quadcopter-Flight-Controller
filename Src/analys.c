@@ -58,13 +58,16 @@ void StartAnalysTask(void const * argument)
 //    GYR_TypeDef gyr_values;
   
   
-  //Delay på 10sekunder för att hinna pair:a från datorn till quadens analys-bluetooth
-  vTaskDelay(10000); // (kommentera bort denna rad om bluetooth inte används)
+  //Delay pÃ¥ 10sekunder fÃ¶r att hinna pair:a frÃ¥n datorn till quadens analys-bluetooth
+  //vTaskDelay(10000); // (kommentera bort denna rad om bluetooth inte anvÃ¤nds)
+
   
   
   /* Thread */
   while(1){
     
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
+
 //    ACC_update_xyz();
 //    GYR_update_xyz();
 //    
@@ -111,7 +114,7 @@ void StartAnalysTask(void const * argument)
     val[ctr++] = filter_data->filter_yaw;
     
     
-    //från PID:n
+    //frÃ¥n PID:n
     val[ctr++] = control_data->PIDoutputGyroYaw.f;    //12        //Change name of errorgyroyaw
     val[ctr++] = control_data->PIDoutputPitch.f;  //13
     val[ctr++] = control_data->PIDoutputRoll.f;   //14
@@ -124,7 +127,7 @@ void StartAnalysTask(void const * argument)
     val[ctr++] = control_data->LBmotor.f;         //18
     
     
-    //från handkontrollern
+    //frÃ¥n handkontrollern
     val[ctr++] = control_data->yaw.f;             //19
     val[ctr++] = control_data->pitch.f;           //20
     val[ctr++] = control_data->roll.f;            //21
@@ -136,7 +139,7 @@ void StartAnalysTask(void const * argument)
     HAL_UART_Transmit(&huart3,(uint8_t*)&val, sizeof(float)*ctr, 4);
     huart3.State = HAL_UART_STATE_READY;
     
-    
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
     // Sleep thread until end of hyperperiod
     vTaskDelayUntil(&last_task_start,MAIN_FREQUENCY); 
   } 
