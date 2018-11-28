@@ -64,6 +64,9 @@ void StartControlTask(void const * arguments)
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_4);
   if(!warmStart)osDelay(5000);
+
+  /* Initialize automatic PID control system */
+  automaticControl_init();
   
   /* Main loop */
   while(1)

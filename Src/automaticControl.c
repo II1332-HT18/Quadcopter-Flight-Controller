@@ -10,6 +10,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "Filter.h"
+#include "moving_average.h"
 
 /* External variables --------------------------------------------------------*/
 extern TIM_OC_InitTypeDef sConfigOC;
@@ -21,6 +22,15 @@ extern TIM_HandleTypeDef htim2;
 static float dt = 0.004;
 
 /* PID variables ----------------*/
+
+/* PID moving averages */
+static int RollMovingAverageSampleSize = 5;
+static int PitchMovingAverageSampleSize = 5;
+static int YawMovingAverageSampleSize = 5;
+
+static MovingAverage *PIDOutputRollAverage;
+static MovingAverage *PIDOutputPitchAverage;
+static MovingAverage *PIDOutputYawAverage;
 
 /* Roll */
 static float roll_kp = 7; //10 
@@ -63,7 +73,23 @@ static int LFmotor = 0;
 static int RBmotor = 0;
 static int LBmotor = 0;
 
+/******************************************************************************
+* @brief Initialize the automatic PID control system.
+* 
+* @param void
+* 
+* @return void
+******************************************************************************/
+void automaticControl_init()
+{
+	PIDOutputRollAverage = moving_average_allocate(RollMovingAverageSampleSize);
+	PIDOutputPitchAverage = moving_average_allocate(PitchMovingAverageSampleSize);
+	PIDOutputYawAverage = moving_average_allocate(YawMovingAverageSampleSize);
 
+	moving_average_init(PIDOutputRollAverage);
+	moving_average_init(PIDOutputPitchAverage);
+	moving_average_init(PIDOutputYawAverage);
+}
 
 /** ****************************************************************************
  * @brief main function for PID controller 
@@ -99,6 +125,14 @@ void automaticControl(main_struct* all_values)
   PID_Pitch(filter_pointer);
   PID_Roll(filter_pointer);
   
+  /* PID moving average calculations */
+  moving_average_move(PIDOutputYawAverage, PIDoutputYaw);
+  moving_average_move(PIDOutputPitchAverage, PIDoutputPitch);
+  moving_average_move(PIDOutputRollAverage, PIDoutputRoll);
+
+  PIDoutputYaw = moving_average_get_average_float(PIDOutputYawAverage);
+  PIDoutputPitch = moving_average_get_average_float(PIDOutputPitchAverage);
+  PIDoutputRoll = moving_average_get_average_float(PIDOutputRollAverage);
   
   /* Motor control */
   ThrustOnMotor = pwm_pointer->thrust;
