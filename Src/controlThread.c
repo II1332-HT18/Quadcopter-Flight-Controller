@@ -71,8 +71,11 @@ void StartControlTask(void const * arguments)
   /* Main loop */
   while(1)
   {
-    
+    //*********RTOS-analytics(may be removed)******
+    //Mark task as started by setting pin(PA6) high
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+    //********************************************* 
+    
     
     /* Get RC control PWM values */
     getPWMinValues(all_values);
@@ -95,9 +98,12 @@ void StartControlTask(void const * arguments)
     automaticControl(all_values);
     
     /* Watchdog check back */
-    gMainloopWDCheckback++;
-
+    gMainloopWDCheckback++;  
+    
+    //*********RTOS-analytics(may be removed)******
+    //Mark task as done by setting pin(PA6) low
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+    //********************************************* 
     
     /* Delay the task to a fixed time to ensure constant execution frequncy */
     vTaskDelayUntil(&last_task_start,CONTROLL_FREQUENCY); 
