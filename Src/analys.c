@@ -56,7 +56,7 @@ void StartAnalysTask(void const * argument)
   
   //***************BLUETOOTH******************
   //A 10 sec delay on the thread to have time to connect to Bluetooth. Otherwise not necessary.
-  //vTaskDelay(10000);
+  vTaskDelay(10000);
   //******************************************
   
   /* Thread */
@@ -67,10 +67,12 @@ void StartAnalysTask(void const * argument)
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
     //********************************************* 
     
-    //might have to use "->"
-    //do this with loop?
+    
     float val[23];
     uint8_t ctr = 0;
+    
+    
+    //Filter data
     val[ctr++] = filter_data->acc_x;
     val[ctr++] = filter_data->acc_y;
     val[ctr++] = filter_data->acc_z;
