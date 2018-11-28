@@ -59,12 +59,13 @@ void StartAnalysTask(void const * argument)
   
   
   //Delay på 10sekunder för att hinna pair:a från datorn till quadens analys-bluetooth
-  vTaskDelay(10000); // (kommentera bort denna rad om bluetooth inte används)
+  //vTaskDelay(10000); // (kommentera bort denna rad om bluetooth inte används)
   
   
   /* Thread */
   while(1){
     
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 //    ACC_update_xyz();
 //    GYR_update_xyz();
 //    
@@ -136,7 +137,7 @@ void StartAnalysTask(void const * argument)
     HAL_UART_Transmit(&huart3,(uint8_t*)&val, sizeof(float)*ctr, 4);
     huart3.State = HAL_UART_STATE_READY;
     
-    
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
     // Sleep thread until end of hyperperiod
     vTaskDelayUntil(&last_task_start,MAIN_FREQUENCY); 
   } 
