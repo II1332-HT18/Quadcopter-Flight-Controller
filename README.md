@@ -5,7 +5,7 @@
 ```
 Analysthread:   8ms   execution time    runs 1 time  in 20ms hyperperiod  
 Controlthread:  4ms   execution time    runs 2 times in 20ms hyperperiod  
-Filterthread:   160us execution time    runs 2 times in 20ms hyperperiod  
+Filterthread:   160us execution time    runs 5 times in 20ms hyperperiod  
 Pwminthread:    1ms   execution time    runs 2 times in 20ms hyperperiod  
 ```
 The analysis thread is delayed with a 10 second vTaskDelay(10000); in order to have time to pair with bluetooth module.
