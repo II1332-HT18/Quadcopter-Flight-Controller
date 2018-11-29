@@ -12,10 +12,10 @@ If you use UART-cable for analysis then just select the right COM-port, click op
 2. Click 'File' -> 'Load Settings' and choose the file 'Quadplotter-beachbois-edition.ini'
 
 ## Automatic Control
-*instructions*
+*readme*
 
 ## Filter
-*instructions*
+*readme*
 
 ## Modelling
-*instructions*
+*readme*
