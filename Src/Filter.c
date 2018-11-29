@@ -14,6 +14,7 @@
 
 /* PRIVATE VARIABLES **********************************************************/
 extern UART_HandleTypeDef huart3;
+extern const portTickType HYPERPERIOD;
 
 /* PRIVATE FUNTIONS ***********************************************************/
 void filter_lowpass(FILTER_lowpass_struct *val, float input);
@@ -87,6 +88,9 @@ void StartsensorFilterTask(void const * arguments)
   
   while(1)
   {
+    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+
     // Preparing accelerometer data.
     ACC_update_xyz();           // Reading sensor data and storing to driver struct.
     ACC_get_struct(&acc_raw);   // Copying driver struct data to local data struct.
@@ -114,7 +118,8 @@ void StartsensorFilterTask(void const * arguments)
     // Send mail
     //  osMailPut(analys_mailbox, lowpass_data_acc_x);
     osMailPut(sensorFilter_mailbox, &complement_data);
-    vTaskDelayUntil(&last_task_start,MAIN_FREQUENCY); 
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+    vTaskDelayUntil(&last_task_start,HYPERPERIOD/5); 
     
   }
 }

@@ -38,7 +38,7 @@ static uint32_t pitch = 0;
 static uint32_t roll = 0;
 static uint32_t yaw = 0;
 static uint32_t emergency = 0;
-extern const portTickType MAIN_FREQUENCY;
+extern const portTickType HYPERPERIOD;
 uint32_t gPwmInWDCheckback=0;
 
 /* Function definitions -----------------------------------------------------*/
@@ -52,6 +52,9 @@ void StartPwmInTask(void const * argument)
 {
   portTickType  last_task_start = xTaskGetTickCount();
   while(1){
+    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+
     
     /*Creates space on the mailbox pwmIn_mailbo*/
     pwmIn_struct *pwmIn_struct_pointer =
@@ -109,8 +112,12 @@ void StartPwmInTask(void const * argument)
     }
 
     gPwmInWDCheckback++;
+    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+
+    
     /*We are done ..and then we wait...*/ 
-    vTaskDelayUntil(&last_task_start,MAIN_FREQUENCY); 
+    vTaskDelayUntil(&last_task_start,HYPERPERIOD/2); 
   
 
   }
