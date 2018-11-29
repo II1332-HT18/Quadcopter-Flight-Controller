@@ -65,8 +65,8 @@ uint8_t reglersystem = 0;
 */
 
 /* Global frequency */
-const portTickType MAIN_FREQUENCY = 4; //Q: what is this used for? SHOULD BE 4
-
+//const portTickType MAIN_FREQUENCY = 4; //Q: what is this used for? SHOULD BE 4
+const portTickType HYPERPERIOD = 20; //20ms hyperperiod
 /* Function definitions ------------------------------------------------------*/
 /* Main program body */
 int main(void)
