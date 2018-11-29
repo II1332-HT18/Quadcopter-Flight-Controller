@@ -119,7 +119,7 @@ void StartsensorFilterTask(void const * arguments)
     //  osMailPut(analys_mailbox, lowpass_data_acc_x);
     osMailPut(sensorFilter_mailbox, &complement_data);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
-    vTaskDelayUntil(&last_task_start,HYPERPERIOD/2); 
+    vTaskDelayUntil(&last_task_start,HYPERPERIOD/5); 
     
   }
 }
