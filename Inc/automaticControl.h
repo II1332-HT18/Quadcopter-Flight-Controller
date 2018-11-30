@@ -7,6 +7,7 @@
 int abs(int i);
 
 /* Private function prototypes -----------------------------------------------*/
+void automaticControl_init();
 void automaticControl(main_struct*);
 
 //void pwmOut(main_struct*);  //Not implemeted

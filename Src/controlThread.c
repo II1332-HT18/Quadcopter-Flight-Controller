@@ -14,6 +14,7 @@ extern TIM_HandleTypeDef htim2;
 extern TIM_OC_InitTypeDef sConfigOC;
 //extern unsigned long start;
 extern uint8_t kalman;
+extern const portTickType HYPERPERIOD;
 
 /* Private variables ---------------------------------------------------------*/
 /* Watchdog check back */
@@ -48,7 +49,7 @@ void StartControlTask(void const * arguments)
   //start = xTaskGetTickCount();
 
   /* Declare local variables for the task */
-  const portTickType CONTROLL_FREQUENCY = 2;  
+ // const portTickType CONTROLL_FREQUENCY = 2;  
   portTickType  last_task_start = xTaskGetTickCount();
   main_struct *all_values = pvPortMalloc(sizeof(main_struct));
   
@@ -64,10 +65,16 @@ void StartControlTask(void const * arguments)
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_4);
   if(!warmStart)osDelay(5000);
+
+  /* Initialize automatic PID control system */
+  automaticControl_init();
   
   /* Main loop */
   while(1)
   {
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+
+    
     /* Get RC control PWM values */
     getPWMinValues(all_values);
     osMailPut(sensorFilter_mailbox, all_values);
@@ -91,8 +98,11 @@ void StartControlTask(void const * arguments)
     /* Watchdog check back */
     gMainloopWDCheckback++;
 
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+
+    
     /* Delay the task to a fixed time to ensure constant execution frequncy */
-    vTaskDelayUntil(&last_task_start,CONTROLL_FREQUENCY); 
+    vTaskDelayUntil(&last_task_start,HYPERPERIOD/2); 
   }
 }
 
