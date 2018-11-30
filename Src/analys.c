@@ -72,6 +72,7 @@ void StartAnalysTask(void const * argument)
     uint8_t ctr = 0;
 
     val[ctr++] = 0;
+
     //Filter data
     val[ctr++] = filter_data->acc_x;
     val[ctr++] = filter_data->acc_y;
