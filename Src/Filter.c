@@ -160,6 +160,12 @@ void filter_lowpass(FILTER_lowpass_struct *IO_data, float input){
   float B1 = 0.4975;
   float B2 = 0.2398;
   
+//  float A1 = -1.3073; 
+//  float A2 = 0.4918;
+//  float B0 = 0.0461;
+//  float B1 = 0.0923;
+//  float B2 = 0.0461;
+  
   // Lowpass filter function.
   y[0] = A1*y[1]+A2*y[2]+B0*x[0]+B1*x[1]+B2*x[2];
   
