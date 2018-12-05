@@ -3,8 +3,8 @@
 ## Analys
 ### Timing and time analys
 ```
-Analysthread:   4ms   execution time    runs 1 time  in 20ms hyperperiod  
-Controlthread:  4ms   execution time    runs 2 times in 20ms hyperperiod 
+Analysthread:   8ms   execution time    runs 1 time  in 20ms hyperperiod  
+Controlthread:  4ms   execution time    runs 2 times in 20ms hyperperiod
 Filterthread:   160us execution time    runs 5 times in 20ms hyperperiod  
 Pwminthread:    1ms   execution time    runs 2 times in 20ms hyperperiod  
 ```
