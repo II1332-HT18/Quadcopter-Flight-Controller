@@ -64,7 +64,6 @@ void StartAnalysTask(void const * argument)
     
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 
-    
     float val[11];
     uint8_t ctr = 0;
     
@@ -73,8 +72,7 @@ void StartAnalysTask(void const * argument)
      *CHOOSE 10 VAlUES TO BE SENT AS CHANNELS TO SERIALPLOT
      *THEY WILL BE IN CHRONOLOGICAL ORDER, E.G. CHANNEL #1 WILL BE SENT FIRST
      */
-    
-    
+
     //Filter data
     val[ctr++] = filter_data->acc_x;            
     val[ctr++] = filter_data->acc_y;            
