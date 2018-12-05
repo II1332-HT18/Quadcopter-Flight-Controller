@@ -126,13 +126,13 @@ void automaticControl(main_struct* all_values)
   PID_Roll(filter_pointer);
   
   /* PID moving average calculations */
-  moving_average_move(PIDOutputYawAverage, PIDoutputYaw);
-  moving_average_move(PIDOutputPitchAverage, PIDoutputPitch);
-  moving_average_move(PIDOutputRollAverage, PIDoutputRoll);
+//  moving_average_move(PIDOutputYawAverage, PIDoutputYaw);
+//  moving_average_move(PIDOutputPitchAverage, PIDoutputPitch);
+//  moving_average_move(PIDOutputRollAverage, PIDoutputRoll);
 
-  PIDoutputYaw = moving_average_get_average_float(PIDOutputYawAverage);
-  PIDoutputPitch = moving_average_get_average_float(PIDOutputPitchAverage);
-  PIDoutputRoll = moving_average_get_average_float(PIDOutputRollAverage);
+//  PIDoutputYaw = moving_average_get_average_float(PIDOutputYawAverage);
+//  PIDoutputPitch = moving_average_get_average_float(PIDOutputPitchAverage);
+//  PIDoutputRoll = moving_average_get_average_float(PIDOutputRollAverage);
   
   /* Motor control */
   ThrustOnMotor = pwm_pointer->thrust;
