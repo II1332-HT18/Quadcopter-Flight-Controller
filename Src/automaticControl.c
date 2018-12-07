@@ -33,9 +33,9 @@ static MovingAverage *PIDOutputPitchAverage;
 static MovingAverage *PIDOutputYawAverage;
 
 /* Roll */
-static float roll_kp = 7; //10 
-static float roll_ki = 0.3; //0.2
-static float roll_kd = 0.54;  //0.4
+static float roll_kp = 13.1136; //13.1136
+static float roll_ki = 3.06; //3.06
+static float roll_kd = 0.325;  //0.478125
 static float filtered_roll_angle;
 static float desired_roll_angle = 0;
 static float errorRoll = 0;
@@ -44,9 +44,9 @@ static float integralRoll = 0;
 static float PIDoutputRoll = 0;
 
 /* Pitch */
-static float pitch_kp = 7;
-static float pitch_ki = 0.3;
-static float pitch_kd = 0.54;
+static float pitch_kp = 13.1136;
+static float pitch_ki = 3.06;
+static float pitch_kd = 0.478125;
 static float desired_pitch_angle=0;
 static float filt_pitch_angle;
 static float errorPitch=0;
@@ -113,8 +113,8 @@ void automaticControl(main_struct* all_values)
   
   /* Setpoint for Yaw, Pitch and Roll */
   desired_yaw_angle = pwm_pointer->yaw;
-  desired_pitch_angle = pwm_pointer->pitch - 2; // -2 due to error from controller
-  desired_roll_angle = pwm_pointer->roll;
+  desired_pitch_angle = pwm_pointer->pitch - 4.8; // -2 due to error from controller
+  desired_roll_angle = pwm_pointer->roll - 2;// controller error
 
   
 

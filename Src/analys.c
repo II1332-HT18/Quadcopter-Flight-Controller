@@ -64,7 +64,7 @@ void StartAnalysTask(void const * argument)
     
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 
-    float val[11];
+    float val[5];
     uint8_t ctr = 0;
     
     val[ctr++] = 1337; //PREAMBLE SHOULD ALWAYS BE SENT
@@ -74,22 +74,22 @@ void StartAnalysTask(void const * argument)
      */
 
     //Filter data
-    val[ctr++] = filter_data->acc_x;            
-    val[ctr++] = filter_data->acc_y;            
-    val[ctr++] = filter_data->acc_z;            
-    val[ctr++] = filter_data->gyr_x;            
-    val[ctr++] = filter_data->gyr_y;            
-    val[ctr++] = filter_data->gyr_z;            
-    val[ctr++] = filter_data->acc_pitch;
-    val[ctr++] = filter_data->acc_roll;
-    val[ctr++] = filter_data->filter_pitch;
-    val[ctr++] = filter_data->filter_roll;
+//    val[ctr++] = filter_data->acc_x;            
+//    val[ctr++] = filter_data->acc_y;            
+//    val[ctr++] = filter_data->acc_z;            
+//    val[ctr++] = filter_data->gyr_x;            
+//    val[ctr++] = filter_data->gyr_y;            
+//    val[ctr++] = filter_data->gyr_z;            
+//    val[ctr++] = filter_data->acc_pitch;
+//    val[ctr++] = filter_data->acc_roll;
+      val[ctr++] = filter_data->filter_pitch;
+      val[ctr++] = filter_data->filter_roll;
 //    val[ctr++] = filter_data->filter_yaw;
 //    
 //    
 //    //Control data
 //    val[ctr++] = control_data->PIDoutputGyroYaw.f;       //TODO:Change name of errorgyroyaw
-//    val[ctr++] = control_data->PIDoutputPitch.f;
+      //val[ctr++] = control_data->PIDoutputPitch.f;
 //    val[ctr++] = control_data->PIDoutputRoll.f;
 //    
 //   
@@ -102,8 +102,8 @@ void StartAnalysTask(void const * argument)
 //    
 //    //Remote
 //    val[ctr++] = control_data->yaw.f;
-//    val[ctr++] = control_data->pitch.f;
-//    val[ctr++] = control_data->roll.f;
+      val[ctr++] = control_data->pitch.f;
+      val[ctr++] = control_data->roll.f;
 //    val[ctr++] = control_data->thrust;
 //    val[ctr++] = control_data->emergency;
      
