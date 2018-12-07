@@ -65,7 +65,7 @@ void StartAnalysTask(void const * argument)
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 
 
-    float val[3];
+    float val[4];
     uint8_t ctr = 0;
 
     val[ctr++] = 1337; //PREAMBLE SHOULD ALWAYS BE SENT
@@ -93,7 +93,7 @@ void StartAnalysTask(void const * argument)
 //    val[ctr++] = filter_data->acc_roll;
     val[ctr++] = filter_data->filter_pitch;
     val[ctr++] = filter_data->filter_roll;
-//    val[ctr++] = filter_data->filter_yaw;
+    val[ctr++] = filter_data->filter_yaw;
 //   val[ctr++] = filter_data->pitch_angle_speed;
 //    val[ctr++] = filter_data->roll_angle_speed;
 //    val[ctr++] = filter_data->yaw_angle_speed;
@@ -128,7 +128,7 @@ void StartAnalysTask(void const * argument)
 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
     // Sleep thread until end of hyperperiod
-    vTaskDelayUntil(&last_task_start,HYPERPERIOD);
+    vTaskDelayUntil(&last_task_start,HYPERPERIOD/5);
     // Changed this, to HYPERPERIOD/5, in order to send data more often
     // then you can send a limited amount of values, works with three
     // the other threads are heavly affected by this and will NOT run properly

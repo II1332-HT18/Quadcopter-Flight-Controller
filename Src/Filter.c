@@ -136,9 +136,14 @@ void StartsensorFilterTask(void const * arguments)
     complement_data.acc_x = lowpass_data_acc_x.output;
     complement_data.acc_y = lowpass_data_acc_y.output;
     complement_data.acc_z = lowpass_data_acc_z.output;
-    complement_data.gyr_x = gyr_raw.x_raw;
-    complement_data.gyr_y = gyr_raw.y_raw;
-    complement_data.gyr_z = gyr_raw.z_raw;
+    complement_data.gyr_x = -gyr_raw.x_raw;
+    complement_data.gyr_y = -gyr_raw.y_raw;
+    complement_data.gyr_z = -gyr_raw.z_raw;
+
+    //Below created to access the RAW acc data to be able ro analyze
+    complement_data.raw_acc_x = acc_raw.x_raw;  //the actual RAW acc_x
+    complement_data.raw_acc_y = acc_raw.y_raw;  //the actual RAW acc_y
+    complement_data.raw_acc_z = acc_raw.z_raw;  //the actual RAW acc_z
 
     // Run complement filter
     filter_complement(&complement_data);
