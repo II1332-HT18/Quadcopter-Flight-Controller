@@ -83,7 +83,7 @@ void StartAnalysTask(void const * argument)
 //    val[ctr++] = filter_data->raw_acc_x;
 //    val[ctr++] = filter_data->raw_acc_y;
 //    val[ctr++] = filter_data->raw_acc_z;
-    val[ctr++] = filter_data->acc_x;
+//    val[ctr++] = filter_data->acc_x;
 //    val[ctr++] = filter_data->acc_y;
 //    val[ctr++] = filter_data->acc_z;
 //    val[ctr++] = filter_data->gyr_x;
@@ -92,7 +92,7 @@ void StartAnalysTask(void const * argument)
 //   val[ctr++] = filter_data->acc_pitch;
 //    val[ctr++] = filter_data->acc_roll;
     val[ctr++] = filter_data->filter_pitch;
-//    val[ctr++] = filter_data->filter_roll;
+    val[ctr++] = filter_data->filter_roll;
 //    val[ctr++] = filter_data->filter_yaw;
 //   val[ctr++] = filter_data->pitch_angle_speed;
 //    val[ctr++] = filter_data->roll_angle_speed;
