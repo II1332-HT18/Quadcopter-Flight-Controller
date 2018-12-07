@@ -68,28 +68,36 @@ void StartAnalysTask(void const * argument)
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 
 
-    float val[11];
+    float val[2];
     uint8_t ctr = 0;
     
     val[ctr++] = 1337; //PREAMBLE SHOULD ALWAYS BE SENT
     /*
      *CHOOSE 10 VAlUES TO BE SENT AS CHANNELS TO SERIALPLOT
      *THEY WILL BE IN CHRONOLOGICAL ORDER, E.G. CHANNEL #1 WILL BE SENT FIRST
+
+     * BE AWARE, above is not viable as long as the hyperperiod is divided by 5
+     * at the end of this function. REMOVE when finished experiminting
      */
 
 
     //Filter data
-    val[ctr++] = filter_data->acc_x;            
-    val[ctr++] = filter_data->acc_y;            
-    val[ctr++] = filter_data->acc_z;            
+    
+    
+//    val[ctr++] = filter_data->raw_acc_x;
+//    val[ctr++] = filter_data->raw_acc_y;
+//    val[ctr++] = filter_data->raw_acc_z;
+//    val[ctr++] = filter_data->acc_x;            
+//    val[ctr++] = filter_data->acc_y;            
+//    val[ctr++] = filter_data->acc_z;            
     val[ctr++] = filter_data->gyr_x;            
-    val[ctr++] = filter_data->gyr_y;            
-    val[ctr++] = filter_data->gyr_z;            
-    val[ctr++] = filter_data->acc_pitch;
-    val[ctr++] = filter_data->acc_roll;
-    val[ctr++] = filter_data->filter_pitch;
-    val[ctr++] = filter_data->filter_roll;
-    val[ctr++] = filter_data->filter_yaw;
+//    val[ctr++] = filter_data->gyr_y;            
+//    val[ctr++] = filter_data->gyr_z;            
+//    val[ctr++] = filter_data->acc_pitch;
+//    val[ctr++] = filter_data->acc_roll;
+//    val[ctr++] = filter_data->filter_pitch;
+//    val[ctr++] = filter_data->filter_roll;
+//    val[ctr++] = filter_data->filter_yaw;
 
 //    //Control data
 //    val[ctr++] = control_data->PIDoutputGyroYaw.f;       //TODO:Change name of errorgyroyaw
@@ -108,13 +116,8 @@ void StartAnalysTask(void const * argument)
 //    val[ctr++] = control_data->roll.f;
 //    val[ctr++] = control_data->thrust;
 //    val[ctr++] = control_data->emergency;
+    
 
-    
-    //Calles egna acc RAW for real
-    
-    val[ctr++] = filter_data->raw_acc_x;
-    val[ctr++] = filter_data->raw_acc_y;
-    val[ctr++] = filter_data->raw_acc_z;
 
 
 
@@ -124,6 +127,10 @@ void StartAnalysTask(void const * argument)
 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
     // Sleep thread until end of hyperperiod
-    vTaskDelayUntil(&last_task_start,HYPERPERIOD);
+    vTaskDelayUntil(&last_task_start,HYPERPERIOD/5);
+    // Changed this, to HYPERPERIOD/5, in order to send data more often
+    // then you can send a limited amount of values, works with three
+    // the other threads are heavly affected by this and will NOT run properly
+    // restore (remove 5) when finished with experiments
   }
 }

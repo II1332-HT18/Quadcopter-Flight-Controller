@@ -4,6 +4,7 @@
 * @author  Alpha Fofana, Carl Mossberg, Simon Lagerqvist, Tommie Höglund Gran
 * @version 1.1
 * @date    2018-11-22
+*
 * @author  Henrik Bjorklund, Therese Kennerberg, Jonathan Lindberg, Simon Strom
 * @version v1.0
 * @date   2017-12-08
@@ -56,6 +57,11 @@ void StartsensorFilterTask(void const * arguments)
   // Initializing complement filter data handle
   FILTER_complement_struct complement_data;
   
+  // Initializing angle speed, the derivative, data handle
+//  FILTER_angle_speed_struct angle_speed_x;
+//  FILTER_angle_speed_struct angle_speed_y;
+//  FILTER_angle_speed_struct angle_speed_z;
+  
   // Setting all lowpass filter parameters to zero.
   lowpass_data_acc_x.val1[0] = 0;
   lowpass_data_acc_x.val1[1] = 0;
@@ -90,6 +96,22 @@ void StartsensorFilterTask(void const * arguments)
   complement_data.filter_yaw    = 0;
   complement_data.acc_pitch = 0;
   complement_data.acc_roll  = 0;
+  //Added 2018-12-06 by CM
+  complement_data.raw_acc_x = 0;
+  complement_data.raw_acc_y = 0;
+  complement_data.raw_acc_z = 0;
+  complement_data.pitch_angle_speed = 0;
+  complement_data.roll_angle_speed = 0;  
+  complement_data.yaw_angle_speed = 0;
+  
+  //Setting angle speed struct values to zero
+//  angle_speed_x.current = 0;
+//  angle_speed_x.old = 0;
+//  angle_speed_y.current = 0;
+//  angle_speed_y.old = 0;
+//  angle_speed_z.current = 0;
+//  angle_speed_z.old = 0;
+//  
   
   while(1)
   {
@@ -124,6 +146,11 @@ void StartsensorFilterTask(void const * arguments)
     
     // Run complement filter
     filter_complement(&complement_data);
+    
+    //Create angle speed values and store in main struct
+//    complement_data.pitch_angle_speed = angle_speed_calculator(complement_data.filter_pitch) ;
+//    complement_data.roll_angle_speed = 0;  
+//    complement_data.yaw_angle_speed = 0;
 
     // Send mail
     //  osMailPut(analys_mailbox, lowpass_data_acc_x);
@@ -133,6 +160,11 @@ void StartsensorFilterTask(void const * arguments)
     
   }
 }
+
+//float angle_speed_calculator(float current_value){
+//  float calculated_angle_speed;
+  
+//}
 /** ****************************************************************************
  * @brief Butterworth lowpass filter
  * 
@@ -145,37 +177,74 @@ void StartsensorFilterTask(void const * arguments)
  * ******************************************************************************/
 void filter_lowpass(FILTER_lowpass_struct *IO_data, float input){
   // Initializing filter values.
-  float x[3];
-  float y[3];
+  // Added more "degrees" for the Butterworth filter
+  // Maybe, we won't need them, remove them in that case!
+  float x[5]; // Added 2018-12-06, 3 -> 5
+  float y[5]; // Added 2018-12-06, 3 -> 5
   x[0] = input;
   x[1] = IO_data->val1[0];
   x[2] = IO_data->val1[1];
+  x[3] = IO_data->val1[2]; // Added 2018-12-06
+  x[4] = IO_data->val1[3]; // Added 2018-12-06
   y[1] = IO_data->val2[0];
   y[2] = IO_data->val2[1];
+  y[3] = IO_data->val2[2]; // Added 2018-12-06
+  y[4] = IO_data->val2[3]; // Added 2018-12-06
   
-  // Constants from Matlab for 2-degree Butterworth filter cutoff = 45Hz, Fsample = 250 Hz
-  float A1 = -0.2212; 
-  float A2 = 0.1802;
-  float B0 = 0.2398;
-  float B1 = 0.4975;
-  float B2 = 0.2398;
+  // Constants from Matlab for 2-degree Butterworth filter cutoff = 55Hz, Fsample = 250 Hz
+//  float A1 = -0.2212; 
+//  float A2 = 0.1802;
+//  float B0 = 0.2398;
+//  float B1 = 0.4975;
+//  float B2 = 0.2398;
   
-//  float A1 = -1.3073; 
-//  float A2 = 0.4918;
-//  float B0 = 0.0461;
-//  float B1 = 0.0923;
-//  float B2 = 0.0461;
+//45Hz WORKS WOHO
+//  float A1 = -0.5193; 
+//  float A2 = 0.2197;
+//  float B0 = 0.1751;
+//  float B1 = 0.3502;
+//  float B2 = 0.1751; 
+  
+  //40Hz WORKS WOHO
+//  float A1 = -0.6710; 
+//  float A2 = 0.2523;
+//  float B0 = 0.1453;
+//  float B1 = 0.2906;
+//  float B2 = 0.1453;  
+  
+    //35Hz FUNKAR  2018-12-06 working since we changed the filter (the As should be negative)
+//  float A1 = -0.8252; 
+//  float A2 = 0.2946;
+//  float B0 = 0.1174;
+//  float B1 = 0.2347;
+//  float B2 = 0.1174;
+  
+   //15Hz, added after we realised that the filtercoeff A should be negative
+ float A1 = -1.4755;
+ float A2 = 0.5869;
+ float B0 = 0.0279;
+ float B1 = 0.0557;
+ float B2 = 0.0279;
+  
   
   // Lowpass filter function.
-  y[0] = A1*y[1]+A2*y[2]+B0*x[0]+B1*x[1]+B2*x[2];
+   y[0] = -A1*y[1]-A2*y[2]+B0*x[0]+B1*x[1]+B2*x[2]; //The old one 2nd degree
+  // y[0] = A1*y[1]+A2*y[2]+A3*y[3]+A4*y[4]+B0*x[0]+B1*x[1]+B2*x[2]+B3*x[3]+B4*x[4]; //4th degree, added 2018-12-06
+  
+//  if  (isinf(y[0]))
+//    printf("We are ****");  
   
   // Storing all filter values.
   IO_data->val1[0] = x[0];
   IO_data->val1[1] = x[1];
   IO_data->val1[2] = x[2];
+  IO_data->val1[3] = x[3]; // Added 2018-12-06, if you want to use higher degree filter
+  IO_data->val1[4] = x[4]; // Added 2018-12-06, if you want to use higher degree filter
   IO_data->val2[0] = y[0];
   IO_data->val2[1] = y[1];
   IO_data->val2[2] = y[2];
+  IO_data->val2[3] = y[3]; // Added 2018-12-06, if you want to use higher degree filter
+  IO_data->val2[4] = y[4]; // Added 2018-12-06, if you want to use higher degree filter
   
   // Storing filtered IO_data value.
   IO_data->output = y[0]; 
