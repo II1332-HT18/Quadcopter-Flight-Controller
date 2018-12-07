@@ -42,7 +42,7 @@ typedef struct {
 // Struct to store old and current value in order to calculate angel speed
 typedef struct {
   float old;            // Holds old value
-  float current;        // Holds the current value
+//  float current;        // Holds the current value
 } FILTER_angle_speed_struct;
 
 
