@@ -179,7 +179,7 @@ float angle_speed_calculator(FILTER_angle_speed_struct *history,float current_va
   float calculated_angle_speed;
   float dt = 0.004;     // Our sampling rate 1/250 Hz
 
-  calculated_angle_speed = -(current_value - history->old)/dt; //Calculate the difference
+  calculated_angle_speed = (current_value - history->old)/dt; //Calculate the difference
   history->old = current_value; //Set the current value to the new old
   return calculated_angle_speed;
 }

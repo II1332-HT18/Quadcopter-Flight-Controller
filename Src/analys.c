@@ -65,7 +65,7 @@ void StartAnalysTask(void const * argument)
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 
 
-    float val[4];
+    float val[3];
     uint8_t ctr = 0;
 
     val[ctr++] = 1337; //PREAMBLE SHOULD ALWAYS BE SENT
@@ -83,18 +83,18 @@ void StartAnalysTask(void const * argument)
 //    val[ctr++] = filter_data->raw_acc_x;
 //    val[ctr++] = filter_data->raw_acc_y;
 //    val[ctr++] = filter_data->raw_acc_z;
-//    val[ctr++] = filter_data->acc_x;
+//    val[ctr++] = filter_data->acc_x;            
 //    val[ctr++] = filter_data->acc_y;
 //    val[ctr++] = filter_data->acc_z;
-//    val[ctr++] = filter_data->gyr_x;
+    val[ctr++] = filter_data->gyr_x;
 //    val[ctr++] = filter_data->gyr_y;
 //    val[ctr++] = filter_data->gyr_z;
 //   val[ctr++] = filter_data->acc_pitch;
 //    val[ctr++] = filter_data->acc_roll;
-    val[ctr++] = filter_data->filter_pitch;
-    val[ctr++] = filter_data->filter_roll;
-    val[ctr++] = filter_data->filter_yaw;
-//   val[ctr++] = filter_data->pitch_angle_speed;
+//    val[ctr++] = filter_data->filter_pitch;
+//    val[ctr++] = filter_data->filter_roll;
+//    val[ctr++] = filter_data->filter_yaw;
+   val[ctr++] = filter_data->pitch_angle_speed;
 //    val[ctr++] = filter_data->roll_angle_speed;
 //    val[ctr++] = filter_data->yaw_angle_speed;
 
