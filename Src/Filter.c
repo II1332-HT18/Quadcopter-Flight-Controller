@@ -24,6 +24,7 @@ extern const portTickType HYPERPERIOD;
 /* PRIVATE FUNTIONS ***********************************************************/
 void filter_lowpass(FILTER_lowpass_struct *val, float input);
 void filter_complement(FILTER_complement_struct* complement_data);
+float angle_speed_calculator(FILTER_angle_speed_struct *history,float current_value);
 
 /* FUNCTION DEFINITIONS *******************************************************/
 /** ****************************************************************************
@@ -58,9 +59,9 @@ void StartsensorFilterTask(void const * arguments)
   FILTER_complement_struct complement_data;
   
   // Initializing angle speed, the derivative, data handle
-//  FILTER_angle_speed_struct angle_speed_x;
-//  FILTER_angle_speed_struct angle_speed_y;
-//  FILTER_angle_speed_struct angle_speed_z;
+  FILTER_angle_speed_struct angle_speed_x;
+  FILTER_angle_speed_struct angle_speed_y;
+  FILTER_angle_speed_struct angle_speed_z;
   
   // Setting all lowpass filter parameters to zero.
   lowpass_data_acc_x.val1[0] = 0;
@@ -105,13 +106,14 @@ void StartsensorFilterTask(void const * arguments)
   complement_data.yaw_angle_speed = 0;
   
   //Setting angle speed struct values to zero
-//  angle_speed_x.current = 0;
-//  angle_speed_x.old = 0;
-//  angle_speed_y.current = 0;
-//  angle_speed_y.old = 0;
-//  angle_speed_z.current = 0;
-//  angle_speed_z.old = 0;
-//  
+//  angle_speed_x.current = 0; //I dont need theses cuurent values, do I?
+  angle_speed_x.old = 0;
+//  angle_speed_y.current = 0; //I dont need theses cuurent values, do I?
+  angle_speed_y.old = 0;
+//  angle_speed_z.current = 0; //I dont need theses cuurent values, do I?
+  angle_speed_z.old = 0;
+
+  
   
   while(1)
   {
@@ -148,12 +150,13 @@ void StartsensorFilterTask(void const * arguments)
     filter_complement(&complement_data);
     
     //Create angle speed values and store in main struct
-//    complement_data.pitch_angle_speed = angle_speed_calculator(complement_data.filter_pitch) ;
-//    complement_data.roll_angle_speed = 0;  
-//    complement_data.yaw_angle_speed = 0;
+    complement_data.pitch_angle_speed = angle_speed_calculator(&angle_speed_x, complement_data.filter_pitch);
+    complement_data.roll_angle_speed = angle_speed_calculator(&angle_speed_y, complement_data.filter_roll);
+    complement_data.yaw_angle_speed = angle_speed_calculator(&angle_speed_z, complement_data.filter_yaw);
+   
 
     // Send mail
-    //  osMailPut(analys_mailbox, lowpass_data_acc_x);
+    //  osMailPut(analys_mailbox, lowpass_data_acc_x); //removed by ??
     osMailPut(sensorFilter_mailbox, &complement_data);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
     vTaskDelayUntil(&last_task_start,HYPERPERIOD/5); 
@@ -161,19 +164,37 @@ void StartsensorFilterTask(void const * arguments)
   }
 }
 
-//float angle_speed_calculator(float current_value){
-//  float calculated_angle_speed;
+/** ****************************************************************************
+ * @brief Simple function to calculate difference a.k.a. change speed of input
+ * 
+ * @param FILTER_angle_speed_struct history Pointer to a struct for saving old
+ * values
+ * @param float current_value The current value
+ *
+ * @return Float The difference between the old value and the new.
+ * @detail Function used to calculate the difference between the current value of (x,y,z)
+ * compared to the old value (x,y,z) stored in a struct. This in order to provide control
+ * crew with good angle-speed to use in PID controller
+ * ******************************************************************************/
+float angle_speed_calculator(FILTER_angle_speed_struct *history,float current_value){
+  float calculated_angle_speed;
+  float dt = 0.004;     // Our sampling rate 1/250 Hz
   
-//}
+  calculated_angle_speed = -(current_value - history->old)/dt; //Calculate the difference
+  history->old = current_value; //Set the current value to the new old
+  return calculated_angle_speed;
+}
+
+
 /** ****************************************************************************
  * @brief Butterworth lowpass filter
  * 
- * @param FILTER_lowpass_struct *axel Pointer to a struct for saving immediate
+ * @param FILTER_lowpass_struct *IO_data Pointer to a struct for saving immediate
  * values
  * @param float input Latest input value for recursive filter
  *
  * @detail Return a value after it have been processed by a 2-order Butterworth
- * filter with cutoff frequency 45Hz.
+ * filter with cutoff frequency XX Hz.
  * ******************************************************************************/
 void filter_lowpass(FILTER_lowpass_struct *IO_data, float input){
   // Initializing filter values.
@@ -263,7 +284,7 @@ void filter_lowpass(FILTER_lowpass_struct *IO_data, float input){
 void filter_complement(FILTER_complement_struct* complement_data){
   float c = 0.98;       // Accelerometer weight constant.
   float dt = 0.004;     // Our sampling rate 1/250 Hz
-  
+
   complement_data->filter_pitch += (complement_data->gyr_x * (GYRO_SENSITIVITY/MILLIDPS_TO_DPS))*dt; // Calculating pitch angle
   complement_data->filter_roll  += (complement_data->gyr_y * (GYRO_SENSITIVITY/MILLIDPS_TO_DPS))*dt; // Calculating roll angle
   complement_data->filter_yaw   += (complement_data->gyr_z * (GYRO_SENSITIVITY/MILLIDPS_TO_DPS))*dt; // Calculating yaw angle

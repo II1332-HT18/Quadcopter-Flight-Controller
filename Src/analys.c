@@ -68,7 +68,7 @@ void StartAnalysTask(void const * argument)
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 
 
-    float val[2];
+    float val[3];
     uint8_t ctr = 0;
     
     val[ctr++] = 1337; //PREAMBLE SHOULD ALWAYS BE SENT
@@ -87,17 +87,20 @@ void StartAnalysTask(void const * argument)
 //    val[ctr++] = filter_data->raw_acc_x;
 //    val[ctr++] = filter_data->raw_acc_y;
 //    val[ctr++] = filter_data->raw_acc_z;
-//    val[ctr++] = filter_data->acc_x;            
+    val[ctr++] = filter_data->acc_x;            
 //    val[ctr++] = filter_data->acc_y;            
 //    val[ctr++] = filter_data->acc_z;            
-    val[ctr++] = filter_data->gyr_x;            
+//    val[ctr++] = filter_data->gyr_x;            
 //    val[ctr++] = filter_data->gyr_y;            
 //    val[ctr++] = filter_data->gyr_z;            
-//    val[ctr++] = filter_data->acc_pitch;
+//   val[ctr++] = filter_data->acc_pitch;
 //    val[ctr++] = filter_data->acc_roll;
-//    val[ctr++] = filter_data->filter_pitch;
+    val[ctr++] = filter_data->filter_pitch;
 //    val[ctr++] = filter_data->filter_roll;
 //    val[ctr++] = filter_data->filter_yaw;
+//   val[ctr++] = filter_data->pitch_angle_speed;
+//    val[ctr++] = filter_data->roll_angle_speed;  
+//    val[ctr++] = filter_data->yaw_angle_speed;
 
 //    //Control data
 //    val[ctr++] = control_data->PIDoutputGyroYaw.f;       //TODO:Change name of errorgyroyaw
@@ -127,7 +130,7 @@ void StartAnalysTask(void const * argument)
 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
     // Sleep thread until end of hyperperiod
-    vTaskDelayUntil(&last_task_start,HYPERPERIOD/5);
+    vTaskDelayUntil(&last_task_start,HYPERPERIOD);
     // Changed this, to HYPERPERIOD/5, in order to send data more often
     // then you can send a limited amount of values, works with three
     // the other threads are heavly affected by this and will NOT run properly
