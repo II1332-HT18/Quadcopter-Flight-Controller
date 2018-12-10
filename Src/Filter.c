@@ -93,26 +93,34 @@ void StartsensorFilterTask(void const * arguments)
   float bias_y_avg;
   float bias_z_avg;
   
-  GYR_update_xyz();
-   
-  
-  for(int i=0; i<100; i++){
-    biasx[i] = gyr_raw.x_raw;
-    biasy[i] = gyr_raw.y_raw;
-    biasz[i] = gyr_raw.z_raw;
-    for(int j=0; j<100; j++){int k = 0; k=10;}
-  }
-  for(int i=0; i<100; i++){
-    bias_x_avg += biasx[i];
-    bias_y_avg += biasy[i];
-    bias_z_avg += biasz[i];
-  }
-  complement_data.errorGyroRoll.f = bias_x_avg/100;
-  complement_data.errorGyroPitch.f = bias_y_avg/100;
-  complement_data.errorGyroYaw.f = bias_z_avg/100;
+  int flagga = 1;
+  //int loopOffset = 5;
   
   while(1)
   {
+    if(flagga == 1){
+      for(int i=0; i<100; i++){
+        // Preparing gyroscope data.
+        GYR_update_xyz();
+        GYR_get_struct(&gyr_raw);
+        
+        for(int j=0; j<100; j++){int k = 0; k=10;}
+        biasx[i] = gyr_raw.x_raw;
+        biasy[i] = gyr_raw.y_raw;
+        biasz[i] = gyr_raw.z_raw;
+      }
+      for(int i=0; i<100; i++){
+        bias_x_avg += biasx[i];
+        bias_y_avg += biasy[i];
+        bias_z_avg += biasz[i];
+      }
+      complement_data.errorGyroRoll.f = bias_x_avg/100;
+      complement_data.errorGyroPitch.f = bias_y_avg/100;
+      complement_data.errorGyroYaw.f = bias_z_avg/100;
+      
+      flagga=0;
+    }
+    
     
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 
