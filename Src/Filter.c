@@ -93,11 +93,14 @@ void StartsensorFilterTask(void const * arguments)
   float bias_y_avg;
   float bias_z_avg;
   
+  GYR_update_xyz();
+   
+  
   for(int i=0; i<100; i++){
     biasx[i] = gyr_raw.x_raw;
     biasy[i] = gyr_raw.y_raw;
     biasz[i] = gyr_raw.z_raw;
-    for(int j=0; j<100; j++){j++; j--;}
+    for(int j=0; j<100; j++){int k = 0; k=10;}
   }
   for(int i=0; i<100; i++){
     bias_x_avg += biasx[i];
