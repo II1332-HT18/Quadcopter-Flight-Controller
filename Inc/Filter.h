@@ -25,6 +25,7 @@ typedef struct {
   
   float acc_pitch;  //Used for the calculated (arctan2) acc_pitch
   float acc_roll;   //Used for the calculated (arctan2) acc_roll
+  float acc_yaw;   //Used for the calculated (arctan2) acc_yaw, added 2018-12-07
   
   float filter_pitch;  //Used for complement filtered pitch
   float filter_roll;   //Used for complement filtered roll
@@ -45,7 +46,8 @@ typedef struct {
 // Struct to store old and current value in order to calculate angel speed
 typedef struct {
   float old;            // Holds old value
-//  float current;        // Holds the current value
+  float older;        // Holds older value in order to calc roling mean value
+  float oldest;         //Holds oldest value
 } FILTER_angle_speed_struct;
   
 
