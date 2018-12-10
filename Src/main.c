@@ -52,6 +52,7 @@ osMailQId analys_mailbox;
 
 /* sensorFilter */
 osMailQDef(sensorFilter_mailbox, 1, main_struct);
+//osMailQDef(sensorFilter_mailbox, 8, FILTER_complement_struct);
 osMailQId sensorFilter_mailbox;
 
 /* Global setting variables --------------------------------------------------*/

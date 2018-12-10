@@ -68,7 +68,7 @@ void StartAnalysTask(void const * argument)
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 
 
-    float val[2];
+    float val[6];
     uint8_t ctr = 0;
     
     val[ctr++] = 1337; //PREAMBLE SHOULD ALWAYS BE SENT
@@ -79,7 +79,7 @@ void StartAnalysTask(void const * argument)
      * BE AWARE, above is not viable as long as the hyperperiod is divided by 5
      * at the end of this function. REMOVE when finished experiminting
      */
-printf("%f\n", filter_data->filter_yaw);
+    //printf("%f\n", filter_data->filter_yaw);
 
     //Filter data
     
@@ -95,15 +95,15 @@ printf("%f\n", filter_data->filter_yaw);
 //    val[ctr++] = filter_data->gyr_z;            
 //    val[ctr++] = filter_data->acc_pitch;
 //    val[ctr++] = filter_data->acc_roll;
-//    val[ctr++] = filter_data->filter_pitch;
-//    val[ctr++] = filter_data->filter_roll;
-     val[ctr++] = filter_data->filter_yaw;
+      val[ctr++] = filter_data->filter_pitch;
+      val[ctr++] = filter_data->filter_roll;
+      val[ctr++] = filter_data->filter_yaw;
 //   val[ctr++] = filter_data->pitch_angle_speed;
 //    val[ctr++] = filter_data->roll_angle_speed;  
 //    val[ctr++] = filter_data->yaw_angle_speed;
 
 //    //Control data
-//    val[ctr++] = control_data->PIDoutputGyroYaw.f;       //TODO:Change name of errorgyroyaw
+    val[ctr++] = control_data->PIDoutputGyroYaw.f;       //TODO:Change name of errorgyroyaw
 //    val[ctr++] = control_data->PIDoutputPitch.f;
 //    val[ctr++] = control_data->PIDoutputRoll.f;
 
@@ -114,7 +114,7 @@ printf("%f\n", filter_data->filter_yaw);
 //    val[ctr++] = control_data->LBmotor.f;
 
 //    //Remote
-//    val[ctr++] = control_data->yaw.f;
+    val[ctr++] = control_data->yaw.f;
 //    val[ctr++] = control_data->pitch.f;
 //    val[ctr++] = control_data->roll.f;
 //    val[ctr++] = control_data->thrust;
