@@ -86,6 +86,28 @@ void StartsensorFilterTask(void const * arguments)
   complement_data.acc_pitch = 0;
   complement_data.acc_roll  = 0;
   
+  float biasx[100];
+  float biasy[100];
+  float biasz[100];
+  float bias_x_avg;
+  float bias_y_avg;
+  float bias_z_avg;
+  
+  for(int i=0; i<100; i++){
+    biasx[i] = gyr_raw.x_raw;
+    biasy[i] = gyr_raw.y_raw;
+    biasz[i] = gyr_raw.z_raw;
+    for(int j=0; j<100; j++){j++; j--;}
+  }
+  for(int i=0; i<100; i++){
+    bias_x_avg += biasx[i];
+    bias_y_avg += biasy[i];
+    bias_z_avg += biasz[i];
+  }
+  complement_data.errorGyroRoll.f = bias_x_avg/100;
+  complement_data.errorGyroPitch.f = bias_y_avg/100;
+  complement_data.errorGyroYaw.f = bias_z_avg/100;
+  
   while(1)
   {
     

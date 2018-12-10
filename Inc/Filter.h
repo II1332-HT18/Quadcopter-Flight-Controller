@@ -30,6 +30,14 @@ typedef struct {
   float filter_pitch;
   float filter_roll;
   float filter_yaw;
+  
+    /* Errors from PID-regulator */ 
+  /* yaw */
+  float2int     errorGyroYaw;          
+  /* pitch */
+  float2int     errorGyroPitch;
+  /* roll */
+  float2int     errorGyroRoll;
 } FILTER_complement_struct;
 
 /* GLOBAL FUNCTIONS ***********************************************************/

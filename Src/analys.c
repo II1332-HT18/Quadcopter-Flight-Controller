@@ -82,9 +82,14 @@ void StartAnalysTask(void const * argument)
     val[ctr++] = filter_data->gyr_z;            
     val[ctr++] = filter_data->acc_pitch;
     val[ctr++] = filter_data->acc_roll;
-    val[ctr++] = filter_data->filter_pitch;
-    val[ctr++] = filter_data->filter_roll;
+//    val[ctr++] = filter_data->filter_pitch;
+//    val[ctr++] = filter_data->filter_roll;
 //    val[ctr++] = filter_data->filter_yaw;
+    
+    /*GYRO BIASED*/
+    val[ctr++] = filter_data->errorGyroRoll;
+    val[ctr++] = filter_data->errorGyroPitch;
+//    val[ctr++] = filter_data->errorGyroYaw;
 //    
 //    
 //    //Control data
