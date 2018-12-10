@@ -33,14 +33,14 @@ typedef struct {
   float filter_yaw;    //Used for complement filtered yaw
 
   // 2018-11-2X added space to send RAW acc data
-  float raw_acc_x;  //New var used for the RAW data acc_x
-  float raw_acc_y;  //New var used for the RAW data acc_y
-  float raw_acc_z;  //New var used for the RAW data acc_z
+//  float raw_acc_x;  //New var used for the RAW data acc_x
+//  float raw_acc_y;  //New var used for the RAW data acc_y
+//  float raw_acc_z;  //New var used for the RAW data acc_z
 
   // 2018-12-06 added space for 'change speed' since the control-group needs it
-  float pitch_angle_speed;    // New var used for speed of change, the derivative
-  float roll_angle_speed;     // New var used for speed of change, the derivative
-  float yaw_angle_speed;      // New var used for speed of change, the derivative
+  //float pitch_angle_speed;    // New var used for speed of change, the derivative
+  //float roll_angle_speed;     // New var used for speed of change, the derivative
+  //float yaw_angle_speed;      // New var used for speed of change, the derivative
 
 } FILTER_complement_struct;
 

@@ -107,7 +107,7 @@ void automaticControl(main_struct* all_values)
   FILTER_complement_struct *filter_pointer = (FILTER_complement_struct*)check_mail.value.p;
   
     /* Actual value for Yaw, Pitch and Roll (angle rates from sensor) */
-  filtered_yaw_angle = filter_pointer->filter_yaw; // -2.3 due to error from sensor????
+  //filtered_yaw_angle = filter_pointer->filter_yaw; // -2.3 due to error from sensor????
   filt_pitch_angle = filter_pointer->filter_pitch;
   filtered_roll_angle = filter_pointer->filter_roll;
   
