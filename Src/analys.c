@@ -68,7 +68,7 @@ void StartAnalysTask(void const * argument)
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_SET);
 
 
-    float val[4];
+    float val[2];
     uint8_t ctr = 0;
     
     val[ctr++] = 1337; //PREAMBLE SHOULD ALWAYS BE SENT
@@ -79,7 +79,7 @@ void StartAnalysTask(void const * argument)
      * BE AWARE, above is not viable as long as the hyperperiod is divided by 5
      * at the end of this function. REMOVE when finished experiminting
      */
-
+printf("%f\n", filter_data->filter_yaw);
 
     //Filter data
     
@@ -90,15 +90,15 @@ void StartAnalysTask(void const * argument)
 //    val[ctr++] = filter_data->acc_x;            
 //    val[ctr++] = filter_data->acc_y;            
 //    val[ctr++] = filter_data->acc_z;            
-    val[ctr++] = filter_data->gyr_x;            
+//    val[ctr++] = filter_data->gyr_x;            
 //    val[ctr++] = filter_data->gyr_y;            
 //    val[ctr++] = filter_data->gyr_z;            
 //    val[ctr++] = filter_data->acc_pitch;
 //    val[ctr++] = filter_data->acc_roll;
-    val[ctr++] = filter_data->filter_pitch;
+//    val[ctr++] = filter_data->filter_pitch;
 //    val[ctr++] = filter_data->filter_roll;
-//    val[ctr++] = filter_data->filter_yaw;
-   val[ctr++] = filter_data->pitch_angle_speed;
+     val[ctr++] = filter_data->filter_yaw;
+//   val[ctr++] = filter_data->pitch_angle_speed;
 //    val[ctr++] = filter_data->roll_angle_speed;  
 //    val[ctr++] = filter_data->yaw_angle_speed;
 
@@ -130,7 +130,7 @@ void StartAnalysTask(void const * argument)
 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_15, GPIO_PIN_RESET);
     // Sleep thread until end of hyperperiod
-    vTaskDelayUntil(&last_task_start,HYPERPERIOD/5);
+    vTaskDelayUntil(&last_task_start,HYPERPERIOD);
     // Changed this, to HYPERPERIOD/5, in order to send data more often
     // then you can send a limited amount of values, works with three
     // the other threads are heavly affected by this and will NOT run properly
