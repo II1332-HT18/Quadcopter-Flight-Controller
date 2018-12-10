@@ -105,12 +105,12 @@ void StartsensorFilterTask(void const * arguments)
   complement_data.yaw_angle_speed = 0;
 
   //Setting angle speed struct values to zero
-//  angle_speed_x.current = 0; //I dont need theses cuurent values, do I?
+  angle_speed_x.older = 0;
   angle_speed_x.old = 0;
-//  angle_speed_y.current = 0; //I dont need theses cuurent values, do I?
+  angle_speed_y.older = 0;
   angle_speed_y.old = 0;
-//  angle_speed_z.current = 0; //I dont need theses cuurent values, do I?
-  angle_speed_z.old = 0;
+//  angle_speed_z.old = 0;
+//  angle_speed_z.older = 0;
 
 
 
@@ -151,7 +151,7 @@ void StartsensorFilterTask(void const * arguments)
     //Create angle speed values and store in main struct
     complement_data.pitch_angle_speed = angle_speed_calculator(&angle_speed_x, complement_data.filter_pitch);
     complement_data.roll_angle_speed = angle_speed_calculator(&angle_speed_y, complement_data.filter_roll);
-    complement_data.yaw_angle_speed = angle_speed_calculator(&angle_speed_z, complement_data.filter_yaw);
+//    complement_data.yaw_angle_speed = angle_speed_calculator(&angle_speed_z, complement_data.filter_yaw);
 
 
     // Send mail
@@ -173,14 +173,24 @@ void StartsensorFilterTask(void const * arguments)
  * @return Float The difference between the old value and the new.
  * @detail Function used to calculate the difference between the current value of (x,y,z)
  * compared to the old value (x,y,z) stored in a struct. This in order to provide control
- * crew with good angle-speed to use in PID controller
+ * crew with good angle-speed to use in PID controller. Added roling mean value based on two
+ * historical values
  * ******************************************************************************/
 float angle_speed_calculator(FILTER_angle_speed_struct *history,float current_value){
   float calculated_angle_speed;
   float dt = 0.004;     // Our sampling rate 1/250 Hz
+  float first_mean, second_mean, third_mean; //Float to hold mean
 
-  calculated_angle_speed = (current_value - history->old)/dt; //Calculate the difference
+  first_mean = (current_value - history->old)/dt; //Calculate the first difference
+  second_mean = (history->old - history->older)/dt; //Calculate the second difference
+  third_mean = (history->older - history->oldest)/dt; //Calculate the third difference
+
+  calculated_angle_speed = (first_mean + second_mean + third_mean)/3; //Calculate the mean
+  //Shift
+  history->oldest = history->older; // Set the older value to the new oldest
+  history->older = history->old; // Set the old value to the new older
   history->old = current_value; //Set the current value to the new old
+
   return calculated_angle_speed;
 }
 
@@ -294,12 +304,12 @@ void filter_complement(FILTER_complement_struct* complement_data){
   // Calculating roll using formula arctan(y/sqrt(x^2+z^2))
   complement_data->acc_roll  = atan2f(complement_data->acc_y,sqrt(pow(complement_data->acc_x,2) + pow(complement_data->acc_z,2))) * 180 / M_PI;
 
-  //complement_data->filter_yaw  = atan2f(complement_data->acc_z,sqrt(pow(complement_data->acc_x,2) + pow(complement_data->acc_z,2))) * 180 / M_PI;
+  //complement_data->acc_yaw = atan2f(complement_data->acc_z,sqrt(pow(complement_data->acc_x,2) + pow(complement_data->acc_z,2))) * 180 / M_PI;
 
   // Using the equation angle=0.98(angle+gyroData*dt)+0.02accData
   complement_data->filter_pitch = c * complement_data->filter_pitch + complement_data->acc_pitch * (1 - c);
   complement_data->filter_roll  = c * complement_data->filter_roll  + complement_data->acc_roll  * (1 - c);
-  //complement_data->filter_yaw  = c * complement_data->filter_yaw  + complement_data->acc_yaw  * (1 - c);
+  complement_data->filter_yaw  = c * complement_data->filter_yaw;
 
   //yaw = 180 * atan (accelerationZ/sqrt(accelerationX*accelerationX + accelerationZ*accelerationZ))/M_PI;
   //roll = 180 * atan (accelerationY/sqrt(accelerationX*accelerationX + accelerationZ*accelerationZ))/M_PI;
