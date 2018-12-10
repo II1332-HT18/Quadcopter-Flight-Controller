@@ -26,7 +26,8 @@ typedef struct {
 
   float acc_pitch;  //Used for the calculated (arctan2) acc_pitch
   float acc_roll;   //Used for the calculated (arctan2) acc_roll
-  float acc_yaw;   //Used for the calculated (arctan2) acc_yaw, added 2018-12-07
+  //float acc_yaw;   //Used for the calculated (arctan2) acc_yaw, added 2018-12-07
+
 
   float filter_pitch;  //Used for complement filtered pitch
   float filter_roll;   //Used for complement filtered roll
