@@ -137,9 +137,9 @@ void StartsensorFilterTask(void const * arguments)
     complement_data.acc_x = lowpass_data_acc_x.output;
     complement_data.acc_y = lowpass_data_acc_y.output;
     complement_data.acc_z = lowpass_data_acc_z.output;
-    complement_data.gyr_x = gyr_raw.x_raw;
-    complement_data.gyr_y = gyr_raw.y_raw;
-    complement_data.gyr_z = gyr_raw.z_raw;
+    complement_data.gyr_x = -gyr_raw.x_raw;
+    complement_data.gyr_y = -gyr_raw.y_raw;
+    complement_data.gyr_z = -gyr_raw.z_raw;
     
     //Below created to access the RAW acc data to be able ro analyze
     complement_data.raw_acc_x = acc_raw.x_raw;  //the actual RAW acc_x
@@ -298,9 +298,10 @@ void filter_complement(FILTER_complement_struct* complement_data){
   //complement_data->filter_yaw  = atan2f(complement_data->acc_z,sqrt(pow(complement_data->acc_x,2) + pow(complement_data->acc_z,2))) * 180 / M_PI;
   
   // Using the equation angle=0.98(angle+gyroData*dt)+0.02accData
+  //complement_data->filter_yaw  = c * complement_data->filter_yaw;
   complement_data->filter_pitch = c * complement_data->filter_pitch + complement_data->acc_pitch * (1 - c);
   complement_data->filter_roll  = c * complement_data->filter_roll  + complement_data->acc_roll  * (1 - c);
-  //complement_data->filter_yaw  = c * complement_data->filter_yaw  + complement_data->acc_yaw  * (1 - c);
+  //complement_data->filter_yaw  = c * complement_data->filter_yaw;
   
   //yaw = 180 * atan (accelerationZ/sqrt(accelerationX*accelerationX + accelerationZ*accelerationZ))/M_PI;
   //roll = 180 * atan (accelerationY/sqrt(accelerationX*accelerationX + accelerationZ*accelerationZ))/M_PI;
