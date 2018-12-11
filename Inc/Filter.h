@@ -15,8 +15,8 @@ extern osMailQId sensorFilter_mailbox;
 
 /* STRUCTS ********************************************************************/
 typedef struct {
-  float val1[3];
-  float val2[3];
+  float val1[5];
+  float val2[5];
   float output; // Filtered output value
 } FILTER_lowpass_struct;
 
