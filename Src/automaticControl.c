@@ -1,41 +1,41 @@
 /**
 ******************************************************************************
 * @file    automaticControl.c
-* @author  Michael Fransson, Michael Henriksson, Ali Qhorbani, Daniel Hooshidar
-* @date    15 December 2017
-* @brief   This file contains the PID control system that stabilizes flight
+* @author  Michael Fransson, Michael Henriksson, Ali Qhorbani, Daniel Hooshidar, 
+*          Alexander Vassiliou, Markus Brislov, David Nordberg
+* @date    11 December 2018
+* @brief   This file contains the PID control system that stabilizes flight.
 ******************************************************************************
 */
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "Filter.h"
-#include "moving_average.h"
 
 /* External variables --------------------------------------------------------*/
 extern TIM_OC_InitTypeDef sConfigOC;
 extern TIM_HandleTypeDef htim2;
-//extern float dt;
 
 /* Private variables ---------------------------------------------------------*/
 
-static float dt = 0.004;
+/* Constants */
+const float dt = 0.01;
+
+const float WINDUP_ROLL_MAX = 10;
+const float WINDUP_PITCH_MAX = 10;
+const float WINDUP_YAW_MAX = 10;
+
+const int GYRO_COMPUTE_BIAS_SAMPLE_SIZE = 1000;
 
 /* PID variables ----------------*/
-
-/* PID moving averages */
-static int RollMovingAverageSampleSize = 5;
-static int PitchMovingAverageSampleSize = 5;
-static int YawMovingAverageSampleSize = 5;
-
-static MovingAverage *PIDOutputRollAverage;
-static MovingAverage *PIDOutputPitchAverage;
-static MovingAverage *PIDOutputYawAverage;
+static float GYRO_BIAS_X = 0;
+static float GYRO_BIAS_Y = 0;
+static float GYRO_BIAS_Z = 0;
 
 /* Roll */
-static float roll_kp = 7; //10 
-static float roll_ki = 0.3; //0.2
-static float roll_kd = 0.54;  //0.4
+static float roll_kp = 0.0858   + 0.5;
+static float roll_ki = 0.112157 + 0.0;
+static float roll_kd = 0.043758 - 0.01;
 static float filtered_roll_angle;
 static float desired_roll_angle = 0;
 static float errorRoll = 0;
@@ -44,23 +44,23 @@ static float integralRoll = 0;
 static float PIDoutputRoll = 0;
 
 /* Pitch */
-static float pitch_kp = 7;
-static float pitch_ki = 0.3;
-static float pitch_kd = 0.54;
-static float desired_pitch_angle=0;
-static float filt_pitch_angle;
-static float errorPitch=0;
-static float derivatePitch=0;
-static float integralPitch=0;
-static float PIDoutputPitch=0;
+static float pitch_kp = 0.282    + 0.1;
+static float pitch_ki = 0.261111 + 0.0;
+static float pitch_kd = 0.07614  + 0.0;
+static float filtered_pitch_angle;
+static float desired_pitch_angle = 0;
+static float errorPitch = 0;
+static float derivatePitch = 0;
+static float integralPitch = 0;
+static float PIDoutputPitch = 0;
 
 /* Yaw */
-static float errorGyroYaw = 0;
-static float kp = 0;
-static float ki = 0;
-static float kd = 0;
+static float yaw_kp = 0;
+static float yaw_ki = 0;
+static float yaw_kd = 0;
 static float filtered_yaw_angle;
 static float desired_yaw_angle = 0;
+static float errorYaw = 0;
 static float derivateYaw = 0;
 static float integralYaw = 0;
 static float PIDoutputYaw = 0;
@@ -82,21 +82,39 @@ static int LBmotor = 0;
 ******************************************************************************/
 void automaticControl_init()
 {
-	PIDOutputRollAverage = moving_average_allocate(RollMovingAverageSampleSize);
-	PIDOutputPitchAverage = moving_average_allocate(PitchMovingAverageSampleSize);
-	PIDOutputYawAverage = moving_average_allocate(YawMovingAverageSampleSize);
-
-	moving_average_init(PIDOutputRollAverage);
-	moving_average_init(PIDOutputPitchAverage);
-	moving_average_init(PIDOutputYawAverage);
+  FILTER_complement_struct *filterPointer;
+  osEvent filterMail;
+  float gyro_bias_x;
+  float gyro_bias_y;
+  float gyro_bias_z;
+  
+  gyro_bias_x = 0;
+  gyro_bias_y = 0;
+  gyro_bias_z = 0;
+  
+  for (int i = 0; i < GYRO_COMPUTE_BIAS_SAMPLE_SIZE; i++) {
+    filterMail = osMailGet(sensorFilter_mailbox, osWaitForever);
+    filterPointer = (FILTER_complement_struct*)filterMail.value.p;
+    
+    gyro_bias_x += filterPointer->gyr_x / GYRO_COMPUTE_BIAS_SAMPLE_SIZE;
+    gyro_bias_y += filterPointer->gyr_y / GYRO_COMPUTE_BIAS_SAMPLE_SIZE;
+    gyro_bias_z += filterPointer->gyr_z / GYRO_COMPUTE_BIAS_SAMPLE_SIZE;
+    
+    osMailFree(sensorFilter_mailbox, filterPointer);
+  }
+  
+  GYRO_BIAS_X = gyro_bias_x;
+  GYRO_BIAS_Y = gyro_bias_y;
+  GYRO_BIAS_Z = gyro_bias_z;
 }
 
-/** ****************************************************************************
- * @brief main function for PID controller 
- *
- * @param pointer to struct containing all global variables
- * 
- ******************************************************************************/
+/*******************************************************************************
+* @brief Main function for the automatic PID control of the quadcopter's orientation.
+* 
+* @param all_values A pointer to the struct containing all global variables.
+* 
+* @return void
+******************************************************************************/
 void automaticControl(main_struct* all_values)
 {
   /* Get mail */
@@ -107,32 +125,22 @@ void automaticControl(main_struct* all_values)
   FILTER_complement_struct *filter_pointer = (FILTER_complement_struct*)check_mail.value.p;
   
     /* Actual value for Yaw, Pitch and Roll (angle rates from sensor) */
-  filtered_yaw_angle = filter_pointer->filter_yaw; // -2.3 due to error from sensor????
-  filt_pitch_angle = filter_pointer->filter_pitch;
+  filtered_yaw_angle = filter_pointer->filter_yaw;
+  filtered_pitch_angle = filter_pointer->filter_pitch;
   filtered_roll_angle = filter_pointer->filter_roll;
   
   /* Setpoint for Yaw, Pitch and Roll */
   desired_yaw_angle = pwm_pointer->yaw;
-  desired_pitch_angle = pwm_pointer->pitch - 2; // -2 due to error from controller
+  desired_pitch_angle = pwm_pointer->pitch;
   desired_roll_angle = pwm_pointer->roll;
-
   
-
-  
+  /* Remote control value limit control */
+  remoteControlLimit();
 
   /*Run PID algoritm for Yaw, Pitch and Roll*/
   PID_Yaw(filter_pointer);
   PID_Pitch(filter_pointer);
   PID_Roll(filter_pointer);
-  
-  /* PID moving average calculations */
-  moving_average_move(PIDOutputYawAverage, PIDoutputYaw);
-  moving_average_move(PIDOutputPitchAverage, PIDoutputPitch);
-  moving_average_move(PIDOutputRollAverage, PIDoutputRoll);
-
-  PIDoutputYaw = moving_average_get_average_float(PIDOutputYawAverage);
-  PIDoutputPitch = moving_average_get_average_float(PIDOutputPitchAverage);
-  PIDoutputRoll = moving_average_get_average_float(PIDOutputRollAverage);
   
   /* Motor control */
   ThrustOnMotor = pwm_pointer->thrust;
@@ -174,14 +182,16 @@ void automaticControl(main_struct* all_values)
 
 /* Function definitions ------------------------------------------------------*/
 
-/** ****************************************************************************
- * @brief Emergency stop to turn off motors
- *
- * @param none
- * 
- * @detail If controller is in emergency stop mode, or thrust is at 0z then bypass PID.
-            Sets motor values to 1000 and disables PID calculations.
- ******************************************************************************/
+/*******************************************************************************
+* @brief Emergency stop to turn off motors.
+*
+* @param void
+* 
+* @return void
+* 
+* @detail If controller is in emergency stop mode, or thrust is at 0z then bypass PID.
+*         Sets motor values to 1000 and disables PID calculations.
+******************************************************************************/
 void emergencyStop(void)
 {
     RFmotor = 1000;
@@ -204,104 +214,99 @@ void emergencyStop(void)
 
 /* Function definitions ------------------------------------------------------*/
 
-/** ****************************************************************************
- * @brief PID control for Yaw
- *
- * @param pointer to struct containing filter variables.
- * 
- ******************************************************************************/
+/*******************************************************************************
+* @brief  Remote control value limit control.
+* 
+* @param  void
+* 
+* @return void
+******************************************************************************/
+void remoteControlLimit()
+{
+  if (desired_roll_angle > 25)       desired_roll_angle = 25;
+  else if (desired_roll_angle < -25) desired_roll_angle = -25;
+  
+  if (desired_pitch_angle > 25)       desired_pitch_angle = 25;
+  else if (desired_pitch_angle < -25) desired_pitch_angle = -25;
+  
+  if (desired_yaw_angle > 25)       desired_yaw_angle = 25;
+  else if (desired_yaw_angle < -25) desired_yaw_angle = -25;
+}
 
+/*******************************************************************************
+* @brief PID control for Yaw.
+* 
+* @param filter_pointer A pointer to struct containing filter variables.
+* 
+* @return void
+******************************************************************************/
 void PID_Yaw(FILTER_complement_struct *filter_pointer)
 {
-  /*Yaw control*/
-  errorGyroYaw = desired_yaw_angle - filtered_yaw_angle; //Calculate error
-  integralYaw += (errorGyroYaw*dt); //I-term
-  derivateYaw = filter_pointer->gyr_z;  //D-term
-  PIDoutputYaw = (kp*errorGyroYaw + ki*integralYaw + kd*derivateYaw);
+    errorYaw    = desired_yaw_angle - filtered_yaw_angle;
+    derivateYaw = 0 - (filter_pointer->gyr_z - GYRO_BIAS_Z);
+
+    if (abs((int)integralPitch) <= WINDUP_YAW_MAX) integralYaw += errorYaw*dt;
+    else if (integralYaw > 0)                      integralYaw = WINDUP_YAW_MAX;
+    else                                           integralYaw = -WINDUP_YAW_MAX;
+
+    PIDoutputYaw = yaw_kp*errorYaw + yaw_ki*integralYaw + yaw_kd*derivateYaw;
 }
 
-/** ****************************************************************************
- * @brief PID control for Pitch
- *
- * @param pointer to struct containing filter variables.
- * 
- * @return none
- ******************************************************************************/
+/*******************************************************************************
+* @brief PID control for Pitch.
+*
+* @param filter_pointer A pointer to struct containing filter variables.
+* 
+* @return void
+******************************************************************************/
 void PID_Pitch(FILTER_complement_struct *filter_pointer)
 {
-  /* Pitch control */  
+  errorPitch    = desired_pitch_angle - filtered_pitch_angle;
+  derivatePitch = 0 - (filter_pointer->gyr_x - GYRO_BIAS_X);
   
-  if(desired_pitch_angle > 25)
-    desired_pitch_angle = 25;
-  else if(desired_pitch_angle < -25)
-    desired_pitch_angle = -25;
+  if (abs((int)integralPitch) <= WINDUP_PITCH_MAX) integralPitch += errorPitch*dt;
+  else if (integralPitch > 0)                      integralPitch = WINDUP_PITCH_MAX;
+  else                                             integralPitch = -WINDUP_PITCH_MAX;
   
-  /* Pitch control */  
-  errorPitch = desired_pitch_angle - filt_pitch_angle - 2; //error
-  
-  //Windup control
-  if(abs((int)integralPitch) <= 50){
-    integralPitch += errorPitch*dt/2; //I-term
-  }
-  else if (integralPitch > 0){
-    integralPitch = 50;
-  }
-  else {
-    integralPitch = -50;
-  }
-  
-  derivatePitch = filter_pointer->gyr_x; //D-term
-  PIDoutputPitch = (pitch_kp*errorPitch + pitch_ki*integralPitch + pitch_kd*derivatePitch)/6; //control signal
+  PIDoutputPitch = pitch_kp*errorPitch + pitch_ki*integralPitch + pitch_kd*derivatePitch;
 }
 
-/** ****************************************************************************
- * @brief PID control for Roll
- *
- * @param pointer to struct containing filter variables.
- * 
- * @return none
- ******************************************************************************/
+/*******************************************************************************
+* @brief PID control for Roll.
+*
+* @param filter_pointer A pointer to struct containing filter variables.
+* 
+* @return void
+******************************************************************************/
 void PID_Roll(FILTER_complement_struct *filter_pointer)
 {
-  /* Roll control */ 
-  if(desired_roll_angle > 25)
-    desired_roll_angle = 25;
-  else if(desired_roll_angle < -25)
-    desired_roll_angle = -25;
+  errorRoll    = desired_roll_angle - filtered_roll_angle;
+  derivateRoll = 0 - (filter_pointer->gyr_y - GYRO_BIAS_Y);
   
-  errorRoll = desired_roll_angle - filtered_roll_angle; //Calculate error
+  if (abs((int)integralRoll) <= WINDUP_ROLL_MAX) integralRoll += errorRoll*dt;
+  else if (integralRoll > 0)                     integralRoll = WINDUP_ROLL_MAX;
+  else                                           integralRoll = -WINDUP_ROLL_MAX;
   
-  //Windup control
-  if(abs((int)integralRoll) <= 50)
-      integralRoll += errorRoll*dt/2; //I-term
-  
-  else if (integralRoll > 0)
-      integralRoll = 50;
-  
-  else
-      integralRoll = -50;
-  
-  derivateRoll = filter_pointer->gyr_y; //D-term
-  PIDoutputRoll =(roll_kp*errorRoll + roll_ki*integralRoll + roll_kd*derivateRoll)/6; //control signal
+  PIDoutputRoll = roll_kp*errorRoll + roll_ki*integralRoll + roll_kd*derivateRoll;
 }
 
-/** ****************************************************************************
- * @brief Motor control
- *
- * @param none
- *
- * @detail Function that sets the regulated values to each motor. 
- *         Checks maximun and minimun values for the motors.
- * 
- * @return none
- ******************************************************************************/
+/*******************************************************************************
+* @brief  Motor limit control and compute pulse-widths for each motor.
+* 
+* @param  void
+* 
+* @return void
+* 
+* @detail Function that sets the regulated values to each motor. 
+*         Checks maximun and minimun values for the motors.
+******************************************************************************/
 void motorControl(void)
 {
   /* PID MONSTER */
-  RFmotor = (int)(PIDoutputYaw + (int) (ThrustOnMotor + (int)PIDoutputRoll - (int)PIDoutputPitch));
-  LFmotor = (int)(-PIDoutputYaw + (int) (ThrustOnMotor - (int)PIDoutputRoll - (int)PIDoutputPitch));
-  RBmotor = (int)(-PIDoutputYaw + (int) (ThrustOnMotor + (int)PIDoutputRoll + (int)PIDoutputPitch));
-  LBmotor = (int)(PIDoutputYaw + (int) (ThrustOnMotor - (int)PIDoutputRoll + (int)PIDoutputPitch));
+  RFmotor = ThrustOnMotor + lroundf( PIDoutputRoll - PIDoutputPitch + PIDoutputYaw);
+  LFmotor = ThrustOnMotor + lroundf(-PIDoutputRoll - PIDoutputPitch - PIDoutputYaw);
+  RBmotor = ThrustOnMotor + lroundf( PIDoutputRoll + PIDoutputPitch - PIDoutputYaw);
+  LBmotor = ThrustOnMotor + lroundf(-PIDoutputRoll + PIDoutputPitch + PIDoutputYaw);
   
   /* Max duty cycle check */
   if(RFmotor > 2000)
@@ -324,17 +329,18 @@ void motorControl(void)
     LBmotor = 1200;
 }
 
-/** ****************************************************************************
- * @brief Change Velocity On Motors With Pulse Width
- *
- * @param PulseWidth Value that changes the speed of the rotor 
- *        Integer that selects which of the four motors to control 
- *
- * @detail Takes an input and changes the Pulse Width to input. Then
- *         changes to the new value and starts PWM again to selected motor.
- * 
- * @return none
- ******************************************************************************/
+/*******************************************************************************
+* @brief Change velocity of a motor with a given pulse-width.
+*
+* @param velocityBasedOnPulseWidth Pulse-width to set the given motor to.
+* 
+* @param whichMotorToChange The 1-indexed motor index to set the pulse-width for.
+*
+* @return void
+* 
+* @detail Takes an input and changes the Pulse Width to input. Then
+*         changes to the new value and starts PWM again to selected motor.
+******************************************************************************/
 void changeVelocityOnMotorsWithPulseWidth (int velocityBasedOnPulseWidth,
                                            int whichMotorToChange)
 {

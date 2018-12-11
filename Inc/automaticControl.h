@@ -10,6 +10,8 @@ int abs(int i);
 void automaticControl_init();
 void automaticControl(main_struct*);
 
+void remoteControlLimit();
+
 //void pwmOut(main_struct*);  //Not implemeted
 void motorControl(void);
 void changeVelocityOnMotorsWithPulseWidth (int velocityBasedOnPulseWidth,
