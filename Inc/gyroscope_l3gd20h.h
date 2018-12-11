@@ -5,8 +5,8 @@
 #define __GYROSCOPE_L3GD20H_H
 
 /* DEFINES ********************************************************************/
-#define GYRO_SENSITIVITY        70.0
-#define MILLIDPS_TO_DPS         1000.0
+#define GYRO_SENSITIVITY        70.0   // Apended decimals to cast to float.
+#define MILLIDPS_TO_DPS         1000.0 // Apended decimals to cast to float.
 
 /* INCLUDES *******************************************************************/
 #include "stm32f3xx_hal.h"
