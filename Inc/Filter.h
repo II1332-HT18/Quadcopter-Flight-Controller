@@ -1,5 +1,10 @@
-/*******************************filter.h***************************************/
-
+/*******************************************************************************
+* @file    filter.c
+*
+* @author  Alpha Fofana, Carl Mossberg, Simon Lagerqvist, Tommie H?glund Gran
+* @version 1.2
+* @date    2018-11-22
+*******************************filter.h***************************************/
 #ifndef __FILTER_H
 #define __FILTER_H
 
@@ -26,22 +31,10 @@ typedef struct {
 
   float acc_pitch;  //Used for the calculated (arctan2) acc_pitch
   float acc_roll;   //Used for the calculated (arctan2) acc_roll
-  //float acc_yaw;   //Used for the calculated (arctan2) acc_yaw, added 2018-12-07
-
 
   float filter_pitch;  //Used for complement filtered pitch
   float filter_roll;   //Used for complement filtered roll
   float filter_yaw;    //Used for complement filtered yaw
-
-  // 2018-11-2X added space to send RAW acc data
-//  float raw_acc_x;  //New var used for the RAW data acc_x
-//  float raw_acc_y;  //New var used for the RAW data acc_y
-//  float raw_acc_z;  //New var used for the RAW data acc_z
-
-  // 2018-12-06 added space for 'change speed' since the control-group needs it
-  //float pitch_angle_speed;    // New var used for speed of change, the derivative
-  //float roll_angle_speed;     // New var used for speed of change, the derivative
-  //float yaw_angle_speed;      // New var used for speed of change, the derivative
 
 } FILTER_complement_struct;
 
@@ -51,7 +44,6 @@ typedef struct {
   float older;        // Holds older value in order to calc roling mean value
   float oldest;         //Holds oldest value
 } FILTER_angle_speed_struct;
-
 
 /* GLOBAL FUNCTIONS ***********************************************************/
 void StartsensorFilterTask(void const * argument);
