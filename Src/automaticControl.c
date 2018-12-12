@@ -33,9 +33,9 @@ static MovingAverage *PIDOutputPitchAverage;
 static MovingAverage *PIDOutputYawAverage;
 
 /* Roll */
-static float roll_kp = 7; //10 
-static float roll_ki = 0.3; //0.2
-static float roll_kd = 0.54;  //0.4
+static float roll_kp = 13.1136; //10 
+static float roll_ki = 3.06; //0.2
+static float roll_kd = 0.478125;  //0.4
 static float filtered_roll_angle;
 static float desired_roll_angle = 0;
 static float errorRoll = 0;
@@ -44,9 +44,9 @@ static float integralRoll = 0;
 static float PIDoutputRoll = 0;
 
 /* Pitch */
-static float pitch_kp = 7;
-static float pitch_ki = 0.3;
-static float pitch_kd = 0.54;
+static float pitch_kp = 13.1136;
+static float pitch_ki = 3.06;
+static float pitch_kd = 0.478125;
 static float desired_pitch_angle=0;
 static float filt_pitch_angle;
 static float errorPitch=0;
@@ -56,9 +56,9 @@ static float PIDoutputPitch=0;
 
 /* Yaw */
 static float errorGyroYaw = 0;
-static float kp = 0;
-static float ki = 0;
-static float kd = 0;
+static float kp = 1;
+static float ki = 0.5;
+static float kd = 0.125;
 static float filtered_yaw_angle;
 static float desired_yaw_angle = 0;
 static float derivateYaw = 0;
@@ -107,12 +107,12 @@ void automaticControl(main_struct* all_values)
   FILTER_complement_struct *filter_pointer = (FILTER_complement_struct*)check_mail.value.p;
   
     /* Actual value for Yaw, Pitch and Roll (angle rates from sensor) */
-  filtered_yaw_angle = filter_pointer->filter_yaw; // -2.3 due to error from sensor????
+  filtered_yaw_angle = filter_pointer->filter_yaw ; // -2.3 due to error from sensor????
   filt_pitch_angle = filter_pointer->filter_pitch;
   filtered_roll_angle = filter_pointer->filter_roll;
   
   /* Setpoint for Yaw, Pitch and Roll */
-  desired_yaw_angle = pwm_pointer->yaw;
+  desired_yaw_angle = pwm_pointer->yaw-2;
   desired_pitch_angle = pwm_pointer->pitch - 2; // -2 due to error from controller
   desired_roll_angle = pwm_pointer->roll;
 
@@ -216,7 +216,7 @@ void PID_Yaw(FILTER_complement_struct *filter_pointer)
   /*Yaw control*/
   errorGyroYaw = desired_yaw_angle - filtered_yaw_angle; //Calculate error
   integralYaw += (errorGyroYaw*dt); //I-term
-  derivateYaw = filter_pointer->gyr_z;  //D-term
+  derivateYaw = -filter_pointer->gyr_z;  //D-term
   PIDoutputYaw = (kp*errorGyroYaw + ki*integralYaw + kd*derivateYaw);
 }
 
@@ -250,7 +250,7 @@ void PID_Pitch(FILTER_complement_struct *filter_pointer)
     integralPitch = -50;
   }
   
-  derivatePitch = filter_pointer->gyr_x; //D-term
+  derivatePitch = -filter_pointer->gyr_x; //D-term
   PIDoutputPitch = (pitch_kp*errorPitch + pitch_ki*integralPitch + pitch_kd*derivatePitch)/6; //control signal
 }
 
@@ -281,7 +281,7 @@ void PID_Roll(FILTER_complement_struct *filter_pointer)
   else
       integralRoll = -50;
   
-  derivateRoll = filter_pointer->gyr_y; //D-term
+  derivateRoll = -filter_pointer->gyr_y; //D-term
   PIDoutputRoll =(roll_kp*errorRoll + roll_ki*integralRoll + roll_kd*derivateRoll)/6; //control signal
 }
 
