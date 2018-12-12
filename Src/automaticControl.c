@@ -56,9 +56,9 @@ static float PIDoutputPitch=0;
 
 /* Yaw */
 static float errorGyroYaw = 0;
-static float kp = 1;
-static float ki = 0;
-static float kd = 0;
+static float kp = 4;
+static float ki = 1;
+static float kd = 0.25;
 static float filtered_yaw_angle;
 static float desired_yaw_angle = 0;
 static float derivateYaw = 0;
