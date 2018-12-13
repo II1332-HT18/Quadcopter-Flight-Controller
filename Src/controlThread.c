@@ -67,6 +67,9 @@ void StartControlTask(void const * arguments)
   if(!warmStart)osDelay(5000);
 
   /* Initialize automatic PID control system */
+  osEvent check_mail = osMailGet(sensorFilter_mailbox, osWaitForever);
+  all_values = check_mail.value.p;
+
   automaticControl_init();
   
   /* Main loop */
