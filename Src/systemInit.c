@@ -560,7 +560,7 @@ void l3gd20h_Init(void)
   
   //CTRL_REG5
   reg_Address = 0x24;                      //rw:0, ms:0 adress: 0x24
-  register_Value = 0x00;                   //0000 0000, Normal mode reboot, FIFO disable, High pass filter disabled, 
+  register_Value = 0x00;                   //0000 0000, Normal mode reboot, FIFO disable, High pass filter DISABLED, 
   write_data(reg_Address, register_Value, GYRO);
   
 }
